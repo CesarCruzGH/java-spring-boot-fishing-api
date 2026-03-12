@@ -1,0 +1,58 @@
+# Technical Documentation Summary: API Pesca Mérida
+
+## 1. High-level Architecture Overview
+The **API Pesca Mérida** is built on the **Spring Boot 3** framework, following a standard **3-tier Layered Architecture** (Controller-Service-Repository). This separation of concerns ensures maintainability and scalability for managing fishery data in the Yucatan region.
+
+*   **Web Layer:** RESTful Controllers handling HTTP requests/responses.
+*   **Business Layer:** Service classes implementing logic for data processing and validation.
+*   **Data Layer:** Repository interfaces using Spring Data JPA for H2/MySQL interaction.
+*   **Model Layer:** JPA Entities representing the core domain (Pez).
+
+---
+
+## 2. Component Breakdown
+
+### Controllers
+| Name | Purpose | Key Methods |
+| :--- | :--- | :--- |
+| [PezController](file:///c:/Users/cesar/IdeaProjects/api-pesca-merida/src/main/java/com/pescayucatan/api_pesca_merida/controller/PezController.java#12-45) | Exposes REST endpoints for fish data management. | [obtenerTemporadaPesca()](file:///c:/Users/cesar/IdeaProjects/api-pesca-merida/src/main/java/com/pescayucatan/api_pesca_merida/controller/PezController.java#23-27), [obtenerPeces(zona)](file:///c:/Users/cesar/IdeaProjects/api-pesca-merida/src/main/java/com/pescayucatan/api_pesca_merida/controller/PezController.java#28-34), [registrarPez(nuevoPez)](file:///c:/Users/cesar/IdeaProjects/api-pesca-merida/src/main/java/com/pescayucatan/api_pesca_merida/controller/PezController.java#38-44) |
+
+### Services
+| Name | Purpose | Key Methods |
+| :--- | :--- | :--- |
+| [PezService](file:///c:/Users/cesar/IdeaProjects/api-pesca-merida/src/main/java/com/pescayucatan/api_pesca_merida/service/PezService.java#12-54) | Orchestrates business logic, validates zones, and handles exceptions. | [buscarPeces(zona)](file:///c:/Users/cesar/IdeaProjects/api-pesca-merida/src/main/java/com/pescayucatan/api_pesca_merida/service/PezService.java#31-48), [guardarPez(pez)](file:///c:/Users/cesar/IdeaProjects/api-pesca-merida/src/main/java/com/pescayucatan/api_pesca_merida/service/PezService.java#27-30), [obtenerPorId(id)](file:///c:/Users/cesar/IdeaProjects/api-pesca-merida/src/main/java/com/pescayucatan/api_pesca_merida/service/PezService.java#48-53) |
+
+### Repositories
+| Name | Purpose | Key Methods |
+| :--- | :--- | :--- |
+| [PezRepository](file:///c:/Users/cesar/IdeaProjects/api-pesca-merida/src/main/java/com/pescayucatan/api_pesca_merida/repository/PezRepository.java#10-15) | Provides abstraction for database operations via JPA. | [findByZona(ZonaPesca)](file:///c:/Users/cesar/IdeaProjects/api-pesca-merida/src/main/java/com/pescayucatan/api_pesca_merida/repository/PezRepository.java#12-14), `save()`, `findAll()` |
+
+### Models (Entities)
+| Name | Purpose | Key Attributes |
+| :--- | :--- | :--- |
+| [Pez](file:///c:/Users/cesar/IdeaProjects/api-pesca-merida/src/main/java/com/pescayucatan/api_pesca_merida/model/Pez.java#4-100) | Represents a fish species with state and fishing season details. | `id`, `nombre`, `zona`, `tipoVeda`, `inicioVeda`, `finVeda`, `enVeda` |
+
+---
+
+## 3. Data Flow
+The system follows a synchronous request-response flow:
+
+1.  **Request:** A client sends an HTTP request (e.g., `GET /peces/temporada?zona=Yucatan`).
+2.  **Controller:** [PezController](file:///c:/Users/cesar/IdeaProjects/api-pesca-merida/src/main/java/com/pescayucatan/api_pesca_merida/controller/PezController.java#12-45) captures the `zona` parameter and delegates to [PezService](file:///c:/Users/cesar/IdeaProjects/api-pesca-merida/src/main/java/com/pescayucatan/api_pesca_merida/service/PezService.java#12-54).
+3.  **Service:** [PezService](file:///c:/Users/cesar/IdeaProjects/api-pesca-merida/src/main/java/com/pescayucatan/api_pesca_merida/service/PezService.java#12-54) converts the string to a `ZonaPesca` enum via [forValue()](file:///c:/Users/cesar/IdeaProjects/api-pesca-merida/src/main/java/com/pescayucatan/api_pesca_merida/enums/ZonaPesca.java#23-32). It validates the input and calls the repository.
+4.  **Repository:** [PezRepository](file:///c:/Users/cesar/IdeaProjects/api-pesca-merida/src/main/java/com/pescayucatan/api_pesca_merida/repository/PezRepository.java#10-15) executes a query against the underlying database.
+5.  **Return Path:** Data (or an Exception) flows back through the Service to the Controller, which returns a JSON response (or structured error via `GlobalExceptionHandler`).
+
+---
+
+## 4. Custom Exceptions & Enums
+
+### Enums
+*   **`ZonaPesca`**: Defines valid geographical areas for fishing.
+    *   *Values:* `YUCATAN`, `CAMPECHE`, `QUINTANA_ROO`, `GOLFO_DE_MEXICO`.
+    *   *Feature:* Includes custom Jackson serialization/deserialization for human-readable names.
+
+### Custom Exceptions
+*   **`PezNotFoundException`**: Triggered when a fish search by ID or Zone yields no results.
+*   **`PezNameNotFoundException`**: Specifically for name-based search failures.
+*   **`GlobalExceptionHandler`**: A central component using `@RestControllerAdvice` to map these exceptions to standard HTTP error codes (e.g., 404 Not Found) with detailed error bodies.

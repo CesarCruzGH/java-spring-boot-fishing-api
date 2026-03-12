@@ -1,6 +1,9 @@
 package com.pescayucatan.api_pesca_merida.model;
+
 import com.pescayucatan.api_pesca_merida.enums.ZonaPesca;
 import jakarta.persistence.*;
+import java.time.LocalDate;
+
 @Entity // Le dice a Spring que esto es una tabla de base de datos
 @Table(name = "peces")
 public class Pez {
@@ -13,14 +16,14 @@ public class Pez {
     @Enumerated(EnumType.STRING)
     private ZonaPesca zona;
     private String tipoVeda; // Permanente, Temporal Fija, Temporal Variable
-    private String inicioVeda; // Formato "DD-MM"
-    private String finVeda;    // Formato "DD-MM"
+    private LocalDate inicioVeda;
+    private LocalDate finVeda;
     private boolean enVeda;
 
     public Pez() {}
 
     public Pez(Long id, String nombre, String nombreCientifico, ZonaPesca zona,
-               String tipoVeda, String inicioVeda, String finVeda, boolean enVeda) {
+               String tipoVeda, LocalDate inicioVeda, LocalDate finVeda, boolean enVeda) {
         this.id = id;
         this.nombre = nombre;
         this.nombreCientifico = nombreCientifico;
@@ -31,7 +34,22 @@ public class Pez {
         this.enVeda = enVeda;
     }
 
-    // Getters y Setters (Los "puertos" para leer y escribir datos)
+    @Transient
+    public boolean isEnVedaActual() {
+        if (inicioVeda == null || finVeda == null) return false;
+
+        LocalDate hoy = LocalDate.now();
+
+        if (inicioVeda.isBefore(finVeda)) {
+            // Caso normal: Feb a Marzo
+            return !hoy.isBefore(inicioVeda) && !hoy.isAfter(finVeda);
+        } else {
+            // Caso cruzado: Diciembre a Julio
+            return !hoy.isBefore(inicioVeda) || !hoy.isAfter(finVeda);
+        }
+    }
+
+    // Getters y Setters
 
     public Long getId() {
         return id;
@@ -73,19 +91,19 @@ public class Pez {
         this.tipoVeda = tipoVeda;
     }
 
-    public String getInicioVeda() {
+    public LocalDate getInicioVeda() {
         return inicioVeda;
     }
 
-    public void setInicioVeda(String inicioVeda) {
+    public void setInicioVeda(LocalDate inicioVeda) {
         this.inicioVeda = inicioVeda;
     }
 
-    public String getFinVeda() {
+    public LocalDate getFinVeda() {
         return finVeda;
     }
 
-    public void setFinVeda(String finVeda) {
+    public void setFinVeda(LocalDate finVeda) {
         this.finVeda = finVeda;
     }
 

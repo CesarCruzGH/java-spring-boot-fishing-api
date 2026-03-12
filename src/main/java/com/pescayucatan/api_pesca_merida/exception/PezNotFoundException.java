@@ -8,7 +8,7 @@ public class PezNotFoundException extends RuntimeException{
     }
 
     public PezNotFoundException (String zonaPesca){
-        super("El pez de la zonaa: " + zonaPesca + " no nada por nuestros mares.");
+        super("El pez de la zona: " + zonaPesca + " no nada por nuestros mares.");
     }
 }
 
