@@ -12,5 +12,5 @@ import java.util.Optional;
 public interface PezRepository extends JpaRepository<Pez, Long> {
     // Aquí ya tienes métodos como save(), findAll(), findById(), etc.
     List<Pez> findByZona(ZonaPesca zona);
-    Optional<Pez> findByNombre(String nombre);
+    Optional<Pez> findByNombreIgnoreCase(String nombre);
 }

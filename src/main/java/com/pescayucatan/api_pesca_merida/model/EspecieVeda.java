@@ -72,4 +72,132 @@ public class EspecieVeda {
     void onUpdate() { this.actualizadoEn = LocalDateTime.now(); }
 
     // Getters y setters omitidos (usar Lombok @Data o generarlos)
+
+    public ZonaPesca getZona() {
+        return zona;
+    }
+
+    public void setZona(ZonaPesca zona) {
+        this.zona = zona;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Pez getPez() {
+        return pez;
+    }
+
+    public void setPez(Pez pez) {
+        this.pez = pez;
+    }
+
+    public TipoVeda getTipoVeda() {
+        return tipoVeda;
+    }
+
+    public void setTipoVeda(TipoVeda tipoVeda) {
+        this.tipoVeda = tipoVeda;
+    }
+
+    public LocalDate getInicioFijo() {
+        return inicioFijo;
+    }
+
+    public void setInicioFijo(LocalDate inicioFijo) {
+        this.inicioFijo = inicioFijo;
+    }
+
+    public LocalDate getFinFijo() {
+        return finFijo;
+    }
+
+    public void setFinFijo(LocalDate finFijo) {
+        this.finFijo = finFijo;
+    }
+
+    public Integer getInicioMes() {
+        return inicioMes;
+    }
+
+    public void setInicioMes(Integer inicioMes) {
+        this.inicioMes = inicioMes;
+    }
+
+    public Integer getInicioDia() {
+        return inicioDia;
+    }
+
+    public void setInicioDia(Integer inicioDia) {
+        this.inicioDia = inicioDia;
+    }
+
+    public Integer getFinMes() {
+        return finMes;
+    }
+
+    public void setFinMes(Integer finMes) {
+        this.finMes = finMes;
+    }
+
+    public Integer getFinDia() {
+        return finDia;
+    }
+
+    public void setFinDia(Integer finDia) {
+        this.finDia = finDia;
+    }
+
+    public Boolean getCancelada() {
+        return cancelada;
+    }
+
+    public void setCancelada(Boolean cancelada) {
+        this.cancelada = cancelada;
+    }
+
+    public String getMotivoCancelacion() {
+        return motivoCancelacion;
+    }
+
+    public void setMotivoCancelacion(String motivoCancelacion) {
+        this.motivoCancelacion = motivoCancelacion;
+    }
+
+    public LocalDateTime getCanceladaEn() {
+        return canceladaEn;
+    }
+
+    public void setCanceladaEn(LocalDateTime canceladaEn) {
+        this.canceladaEn = canceladaEn;
+    }
+
+    public String getFuentePdf() {
+        return fuentePdf;
+    }
+
+    public void setFuentePdf(String fuentePdf) {
+        this.fuentePdf = fuentePdf;
+    }
+
+    public LocalDateTime getCreadoEn() {
+        return creadoEn;
+    }
+
+    public void setCreadoEn(LocalDateTime creadoEn) {
+        this.creadoEn = creadoEn;
+    }
+
+    public LocalDateTime getActualizadoEn() {
+        return actualizadoEn;
+    }
+
+    public void setActualizadoEn(LocalDateTime actualizadoEn) {
+        this.actualizadoEn = actualizadoEn;
+    }
 }
