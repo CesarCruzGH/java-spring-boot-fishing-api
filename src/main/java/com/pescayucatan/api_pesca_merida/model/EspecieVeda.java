@@ -1,14 +1,13 @@
 package com.pescayucatan.api_pesca_merida.model;
 
 import com.pescayucatan.api_pesca_merida.enums.TipoVeda;
-import com.pescayucatan.api_pesca_merida.enums.ZonaPesca;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "especies_vedas")
+@Table(name = "especie_veda")
 public class EspecieVeda {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,9 +18,8 @@ public class EspecieVeda {
     @JoinColumn(name = "pez_id", nullable = false)
     private Pez pez;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ZonaPesca zona;              // enum ya existente
+    @Column(name = "zona")
+    private String zona;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_veda", nullable = false)
@@ -73,11 +71,11 @@ public class EspecieVeda {
 
     // Getters y setters omitidos (usar Lombok @Data o generarlos)
 
-    public ZonaPesca getZona() {
+    public String getZona() {
         return zona;
     }
 
-    public void setZona(ZonaPesca zona) {
+    public void setZona(String zona) {
         this.zona = zona;
     }
 

@@ -1,0 +1,44 @@
+## Tech Stack
+- **Core Languages**: Java 21, Python 3.x.
+- **Frameworks**: Spring Boot 3.5.11, FastAPI 1.0.0.
+- **Critical Dependencies**: `spring-boot-starter-web`, `spring-boot-starter-data-jpa`, `h2` (In-Memory DB runtime), `flyway-mysql` (Migrations), `pdfbox` (3.0.3). Ecosistema Python / Extracción: `camelot` (Lattice mode rendering), `uvicorn`, `fastapi`.
+
+## Architecture
+- **Design Patterns**: MVC / Layered Architecture estricta en el servicio primario Java (`@RestController` -> `@Service` -> `@Repository`). Microservicio auxiliar asíncrono implementado para tareas de procesamiento geométrico intensivo (OCR tabular).
+- **Layer Logic**:
+  - `Controller`: Manejo HTTP concurrente, deserialización JSON `@RequestBody` y asignación semántica de códigos de estado (`@ResponseStatus`).
+  - `Service`: Centralización de validación de negocio y recuperación estructurada (Inyección de dependencias abstractas `@Autowired`).
+  - `Repository`: Accesos DB auto-generados delegando en proxies de Spring Data JPA.
+  - `Extractor (Microservicio)`: Recepción de streams binarios PDF, parseo tensorial de matrices vía `camelot`, y normalización paramétrica para serialización JSON.
+- **Data Flow**: `HTTPRequest` -> `DispatcherServlet` -> `PezController` -> `PezService` (Condicionales lógicos condicionados por Query Params) -> `PezRepository` (Hibernate / H2 Dialect) -> Base de Datos H2. Carga Documental: Cliente -> `/extract` (FastAPI) -> Camelot Pipeline Array -> `JSONResponse` estructurado hacia el Core API.
+
+## Data Model
+- **Entities**:
+  - `Pez`: Entidad principal identificadora. Constraints: PK `id` Auto-generado. Columnas: `nombreComun`, `especie`, `nombreMaya`, `tallaMinima`, `habitad`, `tecnicaRecomendada`, `zona`.
+  - `EspecieVeda`: Rastreo temporal de restricciones legales. Constraints: Relación `@ManyToOne` (Fetch=LAZY) en FK `pez_id`. Campos: `inicioFijo`, `finFijo` (Fechas duras), `inicioMes`, `finDia` (Patrón cíclico recurrente), `tipo_veda` (Enum estricto `TipoVeda`, NO NULL), `cancelada` (Booleano dinámico por defecto `false`).
+  - `IngestionLog`: Auditoría críptica documental. Único bloque independiente paramétrico. Funciones de prevensión de recarga de datos mediante `hash_sha256` (`UNIQUE`).
+- **Relaciones (ERD style)**: `IngestionLog` (Huérfana transaccional). `Pez` (1) `---<` (N) `EspecieVeda`.
+- **DB Constraints**: Base transitoria `jdbc:h2:mem:pescayucatandb`. Hibernate DDL apagado para delegación estricta de control a Flyway (`spring.jpa.hibernate.ddl-auto=none`).
+
+## API/Contracts
+- **Base Paths**: Java (`/peces`), Python (`/extract`, `/debug`).
+- **Endpoints (Java)**:
+  - `GET /peces`: Retirada genérica. Returns `List<Pez>` (`HTTP 200 OK`).
+  - `GET /peces/temporada?zona={zona}`: Filtro perimetral opcional. Returns `List<Pez>` (`HTTP 200`) o detona `PezNotFoundException` (`HTTP 404 NOT_FOUND`).
+  - `GET /peces/{id}`: Extractor nominal primario. Returns `Pez` (`HTTP 200`) o detona `PezNotFoundException` (`HTTP 404`).
+  - `POST /peces`: Registro de inyección REST. Body: Formato JSON de `Pez`. Returns `Pez` (`HTTP 201 CREATED`).
+- **Endpoints (Python)**:
+  - `POST /extract`: Expects `multipart/form-data` (`UploadFile` validado estricto final `.pdf`). Returns payload estructural bidimensional `{"total":N, "errores":N, "rows":[]}` (`HTTP 200` o `HTTP 400`/`500`).
+
+## Core Services
+- **PezService**: Despliegue inteligente de consultas delegando a `findByZona`. Manejo de colisiones Nulas e instancias ausentes en el wrapper `orElseThrow` aplicando AOP.
+- **Extractor Engine**: Algoritmo `NamedTemporaryFile`, bypass de excepciones en filas rotas, mapeo `iloc[0]` / `iloc[1]` sobre Pandas Dataframes resultantes del barrido `lattice` oculo-tabular.
+- **GlobalExceptionHandler**: Anotación iterativa `@RestControllerAdvice`. Neutraliza y mapea excepciones personalizadas (`PezNotFoundException`, `PezNameNotFoundException`) garantizando blindaje de red y enrutamiento hacia la respuesta HTTP estándar (`404`) sin stacktrace expuesto al cliente.
+
+## Operations
+- **Build Requirements**: Soporte de compilación mediante JDK 21+ incrustado (`maven-plugin`), Entorno virtualizado de Python `>= 3.10` dependiente cruzado de OS dependencies (`ghostscript` o dependencias base para Camelot).
+- **Deployment Steps**:
+  1. Bootstrapping DB: Las migraciones Flyway se inyectan en base precomienzo configuradas por `spring.flyway.validate-on-migrate=true`.
+  2. Compilación de entorno Java: `./mvnw clean package`.
+  3. Despliegue Embebido: `java -jar target/api-pesca-merida-0.0.1-SNAPSHOT.jar` (H2 Consola parametrizada en activo).
+  4. Activación en serie de FastAPI (Extractor): `uvicorn main:app --host 0.0.0.0 --port 8000` pre-ingesta de `requirements.txt`.

@@ -3,12 +3,12 @@
 -- 1. Tabla Pez
 CREATE TABLE IF NOT EXISTS pez (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
-    nombre      VARCHAR(100) NOT NULL,
-    zona        VARCHAR(30),
-    tipo_veda   VARCHAR(20),
-    inicio_veda DATE,
-    fin_veda    DATE,
-    en_veda     BOOLEAN DEFAULT FALSE
+    nombre_comun      VARCHAR(100) NOT NULL,
+    especie      VARCHAR(100) NOT NULL,
+    nombre_maya        VARCHAR(30),
+    talla        VARCHAR(30),
+    habitad        VARCHAR(30),
+    tecnica_recomendada   VARCHAR(20),
     );
 
 -- 2. Tabla Especie Veda

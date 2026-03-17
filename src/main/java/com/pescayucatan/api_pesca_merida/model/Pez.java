@@ -1,55 +1,35 @@
 package com.pescayucatan.api_pesca_merida.model;
 
-import com.pescayucatan.api_pesca_merida.enums.ZonaPesca;
 import jakarta.persistence.*;
-import java.time.LocalDate;
 
 @Entity // Le dice a Spring que esto es una tabla de base de datos
-@Table(name = "peces")
+@Table(name = "pez")
 public class Pez {
     @Id // Define la llave primaria
     @GeneratedValue(strategy = GenerationType.IDENTITY) // El ID se genera solo (auto-increment)
     private Long id;
-
-    private String nombre;
-    private String nombreCientifico;
-    @Enumerated(EnumType.STRING)
-    private ZonaPesca zona;
-    private String tipoVeda; // Permanente, Temporal Fija, Temporal Variable
-    private LocalDate inicioVeda;
-    private LocalDate finVeda;
-    private boolean enVeda;
+    private String nombreComun;
+    private String especie;
+    private String nombreMaya;
+    private String tallaMinima;
+    private String habitad;
+    private String tecnicaRecomendada;
+    private String zona;
 
     public Pez() {}
 
-    public Pez(Long id, String nombre, String nombreCientifico, ZonaPesca zona,
-               String tipoVeda, LocalDate inicioVeda, LocalDate finVeda, boolean enVeda) {
-        this.id = id;
-        this.nombre = nombre;
-        this.nombreCientifico = nombreCientifico;
+    public Pez(String zona, String tecnicaRecomendada, String habitad, String tallaMinima, String nombreMaya, String especie, String nombreComun, Long id) {
         this.zona = zona;
-        this.tipoVeda = tipoVeda;
-        this.inicioVeda = inicioVeda;
-        this.finVeda = finVeda;
-        this.enVeda = enVeda;
+        this.tecnicaRecomendada = tecnicaRecomendada;
+        this.habitad = habitad;
+        this.tallaMinima = tallaMinima;
+        this.nombreMaya = nombreMaya;
+        this.especie = especie;
+        this.nombreComun = nombreComun;
+        this.id = id;
     }
 
-    @Transient
-    public boolean isEnVedaActual() {
-        if (inicioVeda == null || finVeda == null) return false;
-
-        LocalDate hoy = LocalDate.now();
-
-        if (inicioVeda.isBefore(finVeda)) {
-            // Caso normal: Feb a Marzo
-            return !hoy.isBefore(inicioVeda) && !hoy.isAfter(finVeda);
-        } else {
-            // Caso cruzado: Diciembre a Julio
-            return !hoy.isBefore(inicioVeda) || !hoy.isAfter(finVeda);
-        }
-    }
-
-    // Getters y Setters
+    //getters and setters
 
     public Long getId() {
         return id;
@@ -59,60 +39,60 @@ public class Pez {
         this.id = id;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getNombreComun() {
+        return nombreComun;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setNombreComun(String nombreComun) {
+        this.nombreComun = nombreComun;
     }
 
-    public String getNombreCientifico() {
-        return nombreCientifico;
+    public String getEspecie() {
+        return especie;
     }
 
-    public void setNombreCientifico(String nombreCientifico) {
-        this.nombreCientifico = nombreCientifico;
+    public void setEspecie(String especie) {
+        this.especie = especie;
     }
 
-    public ZonaPesca getZona() {
+    public String getNombreMaya() {
+        return nombreMaya;
+    }
+
+    public void setNombreMaya(String nombreMaya) {
+        this.nombreMaya = nombreMaya;
+    }
+
+    public String getTallaMinima() {
+        return tallaMinima;
+    }
+
+    public void setTallaMinima(String tallaMinima) {
+        this.tallaMinima = tallaMinima;
+    }
+
+    public String getHabitad() {
+        return habitad;
+    }
+
+    public void setHabitad(String habitad) {
+        this.habitad = habitad;
+    }
+
+    public String getTecnicaRecomendada() {
+        return tecnicaRecomendada;
+    }
+
+    public void setTecnicaRecomendada(String tecnicaRecomendada) {
+        this.tecnicaRecomendada = tecnicaRecomendada;
+    }
+
+    public String getZona() {
         return zona;
     }
 
-    public void setZona(ZonaPesca zona) {
+    public void setZona(String zona) {
         this.zona = zona;
-    }
-
-    public String getTipoVeda() {
-        return tipoVeda;
-    }
-
-    public void setTipoVeda(String tipoVeda) {
-        this.tipoVeda = tipoVeda;
-    }
-
-    public LocalDate getInicioVeda() {
-        return inicioVeda;
-    }
-
-    public void setInicioVeda(LocalDate inicioVeda) {
-        this.inicioVeda = inicioVeda;
-    }
-
-    public LocalDate getFinVeda() {
-        return finVeda;
-    }
-
-    public void setFinVeda(LocalDate finVeda) {
-        this.finVeda = finVeda;
-    }
-
-    public boolean isEnVeda() {
-        return enVeda;
-    }
-
-    public void setEnVeda(boolean enVeda) {
-        this.enVeda = enVeda;
     }
 }
 
