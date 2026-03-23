@@ -2,20 +2,21 @@
 
 -- 1. Tabla Pez
 CREATE TABLE IF NOT EXISTS pez (
-    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id          BIGINT PRIMARY KEY,
     nombre_comun      VARCHAR(100) NOT NULL,
     especie      VARCHAR(100) NOT NULL,
     nombre_maya        VARCHAR(30),
-    talla        VARCHAR(30),
-    habitad        VARCHAR(30),
-    tecnica_recomendada   VARCHAR(20),
+    talla_minima        VARCHAR(200),
+    habitat        VARCHAR(200),
+    tecnica_recomendada   VARCHAR(200),
+    zona                VARCHAR(200) NOT NULL
     );
 
 -- 2. Tabla Especie Veda
 CREATE TABLE IF NOT EXISTS especie_veda (
     id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
     pez_id              BIGINT NOT NULL,
-    zona                VARCHAR(30) NOT NULL,
+    zona                VARCHAR(200) NOT NULL,
     tipo_veda           VARCHAR(20) NOT NULL, -- Cambiado de ENUM a VARCHAR para H2
 
 -- Fechas absolutas
@@ -34,7 +35,7 @@ CREATE TABLE IF NOT EXISTS especie_veda (
     cancelada_en        TIMESTAMP, -- H2 prefiere TIMESTAMP sobre DATETIME
 
 -- Auditoría
-    fuente_pdf          VARCHAR(255),
+    fuente_dof          VARCHAR(255),
     creado_en           TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     actualizado_en      TIMESTAMP,
 
@@ -42,7 +43,7 @@ CREATE TABLE IF NOT EXISTS especie_veda (
     );
 
 -- 3. Tabla Ingestion Log
-CREATE TABLE IF NOT EXISTS ingestion_log (
+CREATE TABLE IF NOT EXISTS ingestions_logs (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
     nombre_archivo  VARCHAR(255) NOT NULL,
     hash_sha256     CHAR(64) NOT NULL UNIQUE,

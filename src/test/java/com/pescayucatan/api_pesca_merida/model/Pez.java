@@ -6,23 +6,22 @@ import jakarta.persistence.*;
 @Table(name = "pez")
 public class Pez {
     @Id // Define la llave primaria
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // El ID se genera solo (auto-increment)
     private Long id;
-    @Column(name = "nombre_comun")
     private String nombreComun;
     private String especie;
     private String nombreMaya;
-    @Column(name = "TALLA_MINIMA")
     private String tallaMinima;
-    private String habitat;
+    private String habitad;
     private String tecnicaRecomendada;
     private String zona;
 
     public Pez() {}
 
-    public Pez(String zona, String tecnicaRecomendada, String habitat, String tallaMinima, String nombreMaya, String especie, String nombreComun, Long id) {
+    public Pez(String zona, String tecnicaRecomendada, String habitad, String tallaMinima, String nombreMaya, String especie, String nombreComun, Long id) {
         this.zona = zona;
         this.tecnicaRecomendada = tecnicaRecomendada;
-        this.habitat = habitat;
+        this.habitad = habitad;
         this.tallaMinima = tallaMinima;
         this.nombreMaya = nombreMaya;
         this.especie = especie;
@@ -72,12 +71,12 @@ public class Pez {
         this.tallaMinima = tallaMinima;
     }
 
-    public String getHabitat() {
-        return habitat;
+    public String getHabitad() {
+        return habitad;
     }
 
-    public void setHabitat(String habitat) {
-        this.habitat = habitat;
+    public void setHabitad(String habitad) {
+        this.habitad = habitad;
     }
 
     public String getTecnicaRecomendada() {

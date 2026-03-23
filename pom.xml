@@ -66,6 +66,13 @@
 			<artifactId>flyway-mysql</artifactId>
 			<!-- La versión la gestiona Spring Boot BOM automáticamente -->
 		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>

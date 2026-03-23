@@ -2,27 +2,22 @@ package com.pescayucatan.api_pesca_merida.controller;
 
 import com.pescayucatan.api_pesca_merida.model.Pez;
 import com.pescayucatan.api_pesca_merida.service.PezService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
 @RequestMapping("/peces")
-@RequiredArgsConstructor
 public class PezController {
 
     private final PezService pezService;
-    /*
+
     @Autowired
     public PezController(PezService pezService) {
         this.pezService = pezService;
     }
-
-     */
 
     @GetMapping
     public List<Pez> obtenerTemporadaPesca() {

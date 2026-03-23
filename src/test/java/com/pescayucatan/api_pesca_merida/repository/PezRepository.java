@@ -9,9 +9,8 @@ import java.util.Optional;
 
 @Repository
 public interface PezRepository extends JpaRepository<Pez, Long> {
+    // Aquí ya tienes métodos como save(), findAll(), findById(), etc.
     List<Pez> findByZona(String zona);
-
-    // CAMBIO AQUÍ: Debe decir NombreComun (que es el nombre de tu variable en la clase Pez)
     Optional<Pez> findByNombreComunIgnoreCase(String nombreComun);
 
 }

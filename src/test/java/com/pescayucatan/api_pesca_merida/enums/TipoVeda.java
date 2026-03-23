@@ -16,7 +16,6 @@ public enum TipoVeda {
             case "TEMPORAL FIJA"     -> TEMPORAL_FIJA;
             case "TEMPORAL VARIABLE" -> TEMPORAL_VARIABLE;
             case "PERMANENTE"        -> PERMANENTE;
-            case "PLURIANUAL"        -> PLURIANUAL;
             default -> throw new IllegalArgumentException(
                     "TipoVeda desconocido: " + raw
             );

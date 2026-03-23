@@ -57,8 +57,8 @@ public class EspecieVeda {
     private LocalDateTime canceladaEn;
 
     // --- Auditoría ---
-    @Column(name = "fuente_dof")
-    private String fuente_dof;            // Nombre/hash del PDF origen
+    @Column(name = "fuente_pdf")
+    private String fuentePdf;            // Nombre/hash del PDF origen
 
     @Column(name = "creado_en", updatable = false)
     private LocalDateTime creadoEn = LocalDateTime.now();
@@ -176,11 +176,11 @@ public class EspecieVeda {
     }
 
     public String getFuentePdf() {
-        return fuente_dof;
+        return fuentePdf;
     }
 
-    public void setFuenteDof(String fuentePdf) {
-        this.fuente_dof = fuentePdf;
+    public void setFuentePdf(String fuentePdf) {
+        this.fuentePdf = fuentePdf;
     }
 
     public LocalDateTime getCreadoEn() {
