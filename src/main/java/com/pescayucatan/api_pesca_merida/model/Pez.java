@@ -1,99 +1,32 @@
 package com.pescayucatan.api_pesca_merida.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity // Le dice a Spring que esto es una tabla de base de datos
 @Table(name = "pez")
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class Pez {
     @Id // Define la llave primaria
     private Long id;
+
     @Column(name = "nombre_comun")
     private String nombreComun;
+
     private String especie;
     private String nombreMaya;
+
     @Column(name = "TALLA_MINIMA")
     private String tallaMinima;
+
     private String habitat;
     private String tecnicaRecomendada;
     private String zona;
-
-    public Pez() {}
-
-    public Pez(String zona, String tecnicaRecomendada, String habitat, String tallaMinima, String nombreMaya, String especie, String nombreComun, Long id) {
-        this.zona = zona;
-        this.tecnicaRecomendada = tecnicaRecomendada;
-        this.habitat = habitat;
-        this.tallaMinima = tallaMinima;
-        this.nombreMaya = nombreMaya;
-        this.especie = especie;
-        this.nombreComun = nombreComun;
-        this.id = id;
-    }
-
-    //getters and setters
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNombreComun() {
-        return nombreComun;
-    }
-
-    public void setNombreComun(String nombreComun) {
-        this.nombreComun = nombreComun;
-    }
-
-    public String getEspecie() {
-        return especie;
-    }
-
-    public void setEspecie(String especie) {
-        this.especie = especie;
-    }
-
-    public String getNombreMaya() {
-        return nombreMaya;
-    }
-
-    public void setNombreMaya(String nombreMaya) {
-        this.nombreMaya = nombreMaya;
-    }
-
-    public String getTallaMinima() {
-        return tallaMinima;
-    }
-
-    public void setTallaMinima(String tallaMinima) {
-        this.tallaMinima = tallaMinima;
-    }
-
-    public String getHabitat() {
-        return habitat;
-    }
-
-    public void setHabitat(String habitat) {
-        this.habitat = habitat;
-    }
-
-    public String getTecnicaRecomendada() {
-        return tecnicaRecomendada;
-    }
-
-    public void setTecnicaRecomendada(String tecnicaRecomendada) {
-        this.tecnicaRecomendada = tecnicaRecomendada;
-    }
-
-    public String getZona() {
-        return zona;
-    }
-
-    public void setZona(String zona) {
-        this.zona = zona;
-    }
 }
 

@@ -16,13 +16,6 @@ import java.util.List;
 public class PezController {
 
     private final PezService pezService;
-    /*
-    @Autowired
-    public PezController(PezService pezService) {
-        this.pezService = pezService;
-    }
-
-     */
 
     @GetMapping
     public List<Pez> obtenerTemporadaPesca() {

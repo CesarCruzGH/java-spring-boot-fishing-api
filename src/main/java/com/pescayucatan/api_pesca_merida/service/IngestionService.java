@@ -28,6 +28,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -102,7 +103,7 @@ public class IngestionService {
      * - @Scheduled (automático según cron)
      * - IngestionController (manual vía API)
      */
-    @Scheduled(initialDelay = 30000, fixedDelay = 600000)
+    @Scheduled(cron = "${ingestion.cron}")
     public void ejecutarIngestion() {
         log.info("╔════════════════════════════════════════════════════════════════╗");
         log.info("║  🔄 INICIANDO PROCESO DE INGESTIÓN CONAPESCA                  ║");
@@ -347,9 +348,8 @@ public class IngestionService {
                 veda.setFinMes(dto.finMes());
                 veda.setFinDia(dto.finDia());
                 veda.setFuenteDof(dto.fuenteDof());
-
-                // Nota: inicioFijo y finFijo se parsean vacíos en CSV actual
-                // Dejarlos null por ahora
+                veda.setInicioFijo(dto.inicioFijo().isBlank() ? null : LocalDate.parse(dto.inicioFijo()));
+                veda.setFinFijo(dto.finFijo().isBlank() ? null : LocalDate.parse(dto.finFijo()));
 
                 // 5. Save
                 especieVedaRepository.save(veda);
