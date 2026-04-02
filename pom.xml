@@ -53,6 +53,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
+
 		<!-- Agregar Spring Security Test para tests de autorización -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
