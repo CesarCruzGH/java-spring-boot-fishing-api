@@ -57,8 +57,8 @@ public class CsvParserService {
             try {
                 String[] cols = parseCsvLine(lines[i]);
 
-                // Validación: Mínimo 8 columnas
-                if (cols.length < 8) {
+                // Validación: Mínimo 10 columnas
+                if (cols.length < 10) {
                     log.warn("Fila {} de especies incompleta ({} cols): {}",
                             i + 1, cols.length, lines[i]);
                     continue;
@@ -69,10 +69,12 @@ public class CsvParserService {
                         cols[1].trim(),            // Nombre Común
                         cols[2].trim(),            // Especie Científica
                         cols[3].trim(),            // Nombre Maya
-                        cols[4].trim(),            // Talla Mínima
-                        cols[5].trim(),            // Hábitat
-                        cols[6].trim(),            // Técnica Recomendada
-                        cols[7].trim()             // Zona Geográfica
+                        cols[4].trim(),            // Descripcion
+                        cols[5].trim(),            // Ciguatera
+                        Boolean.parseBoolean(cols[6]),  //Invasiva
+                        Boolean.parseBoolean(cols[7]),  //Protegida
+                        cols[8].trim(),             //Tipo Agua
+                        Boolean.parseBoolean(cols[9])   //Migratorio
                 ));
 
             } catch (Exception e) {
@@ -176,8 +178,9 @@ public class CsvParserService {
      */
     private void validateEspeciesHeader(String headerLine) {
         String[] expectedCols = {
-                "ID", "NOMBRE COMÚN", "ESPECIE", "NOMBRE MAYA",
-                "TALLA MÍNIMA", "HÁBITAT", "TÉCNICA RECOMENDADA", "ZONA"
+                "ID", "NOMBRE COMÚN", "NOMBRE CIENTÍFICO", "NOMBRE MAYA",
+                "DESCRIPCIÓN", "RIESGO CIGUATERA", "ES INVASIVA", "ES PROTEGIDA",
+                "TIPO AGUA", "MIGRATORIO"
         };
 
         String[] actualCols = parseCsvLine(headerLine);
@@ -188,7 +191,6 @@ public class CsvParserService {
                     actualCols.length, expectedCols.length);
         }
 
-        // Log de header actual para debugging
         log.debug("Header especies: {}", String.join(" | ", actualCols));
     }
 

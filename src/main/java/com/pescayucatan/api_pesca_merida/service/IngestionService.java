@@ -103,7 +103,8 @@ public class IngestionService {
      * - @Scheduled (automático según cron)
      * - IngestionController (manual vía API)
      */
-    @Scheduled(cron = "${ingestion.cron}")
+    //@Scheduled(cron = "${ingestion.cron}")
+    @Scheduled(initialDelay = 10000, fixedDelay = 180000)
     public void ejecutarIngestion() {
         log.info("╔════════════════════════════════════════════════════════════════╗");
         log.info("║  🔄 INICIANDO PROCESO DE INGESTIÓN CONAPESCA                  ║");
@@ -263,28 +264,30 @@ public class IngestionService {
 
         for (EspecieCsvRow dto : especies) {
             try {
-                // Buscar si ya existe por código CONAPESCA
                 Pez pez = pezRepository.findById(Long.valueOf(dto.id()))
                         .orElse(new Pez());
 
-                // Mapear DTO → Entity
                 pez.setId(Long.valueOf(dto.id()));
                 pez.setNombreComun(dto.nombreComun());
-                pez.setEspecie(dto.especieCientifica());
+                pez.setNombreCientifico(dto.nombreCientifico());
                 pez.setNombreMaya(dto.nombreMaya());
-                pez.setTallaMinima(dto.tallaMinima());
-                pez.setHabitat(dto.habitat());
-                pez.setTecnicaRecomendada(dto.tecnicaRecomendada());
-                pez.setZona(dto.zona());
+                pez.setDescripcion(dto.descripcion());
+                if (dto.riesgoCiguatera() != null && !dto.riesgoCiguatera().isBlank()) {
+                    pez.setRiesgoCiguatera(com.pescayucatan.api_pesca_merida.enums.RiesgoCiguatera.valueOf(dto.riesgoCiguatera().toUpperCase().trim()));
+                }
+                pez.setEsInvasiva(dto.esInvasiva());
+                pez.setEsProtegida(dto.esProtegida());
+                if (dto.tipoAgua() != null && !dto.tipoAgua().isBlank()) {
+                    pez.setTipoAgua(com.pescayucatan.api_pesca_merida.enums.TipoAgua.valueOf(dto.tipoAgua().toUpperCase().trim()));
+                }
+                pez.setMigratorio(dto.migratorio());
 
-                // Save (Spring decide si es INSERT o UPDATE)
                 pezRepository.save(pez);
                 contador++;
 
             } catch (Exception e) {
                 log.warn("⚠️  Error procesando especie ID {}: {}",
                         dto.id(), e.getMessage());
-                // Continuar con siguiente (no rompe todo el proceso)
             }
         }
 

@@ -27,18 +27,6 @@ public class PezService {
         return pezRepository.save(pez);
     }
 
-    public List<Pez> buscarPeces(String zona) {
-        if (zona == null || zona.isEmpty()) {
-            return pezRepository.findAll();
-        }
-        // 1. Obtenemos la lista primero
-        List<Pez> resultados = pezRepository.findByZona(zona);
-        // 2. Verificamos si la lista no tiene nada
-        if (resultados.isEmpty()) {
-            throw new PezNotFoundException(zona);
-        }
-        return resultados;
-    }
     // En PezService.java
     public Pez obtenerPorId(Long id) {
         return pezRepository.findById(id)

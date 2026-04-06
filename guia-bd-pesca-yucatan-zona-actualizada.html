@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía BD Pesca Yucatán</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root,[data-theme="light"]{
+  --color-bg:#f4f6f4;--color-surface:#f9faf9;--color-surface-2:#ffffff;
+  --color-surface-offset:#eaede9;--color-divider:#d6dbd5;--color-border:#cdd3cc;
+  --color-text:#1a2218;--color-text-muted:#5a6b58;--color-text-faint:#9aaa98;
+  --color-text-inverse:#f4f6f4;
+  --color-primary:#1a6b3a;--color-primary-hover:#145530;--color-primary-active:#0f3e23;
+  --color-primary-highlight:#cde0d4;
+  --color-blue:#006494;--color-blue-highlight:#c6d8e4;
+  --color-warning:#964219;--color-warning-highlight:#ddcfc6;
+  --color-error:#a12c7b;--color-error-highlight:#e0ced7;
+  --color-gold:#b07a00;--color-gold-highlight:#e9e0c6;
+  --color-purple:#7a39bb;--color-purple-highlight:#dacfde;
+  --radius-sm:0.375rem;--radius-md:0.5rem;--radius-lg:0.75rem;--radius-xl:1rem;--radius-full:9999px;
+  --shadow-sm:0 1px 2px oklch(0.2 0.02 140/0.06);--shadow-md:0 4px 12px oklch(0.2 0.02 140/0.08);--shadow-lg:0 12px 32px oklch(0.2 0.02 140/0.12);
+  --transition-interactive:180ms cubic-bezier(0.16,1,0.3,1);
+  --space-1:.25rem;--space-2:.5rem;--space-3:.75rem;--space-4:1rem;--space-5:1.25rem;--space-6:1.5rem;--space-8:2rem;--space-10:2.5rem;--space-12:3rem;
+  --text-xs:clamp(0.75rem,0.7rem + 0.25vw,0.875rem);
+  --text-sm:clamp(0.875rem,0.8rem + 0.35vw,1rem);
+  --text-base:clamp(1rem,0.95rem + 0.25vw,1.125rem);
+  --text-lg:clamp(1.125rem,1rem + 0.75vw,1.5rem);
+  --text-xl:clamp(1.5rem,1.2rem + 1.25vw,2.25rem);
+  --font-display:"Instrument Serif",Georgia,serif;
+  --font-body:"Inter","Helvetica Neue",sans-serif;
+}
+[data-theme="dark"]{
+  --color-bg:#111a12;--color-surface:#172019;--color-surface-2:#1d2a1f;
+  --color-surface-offset:#1b2520;--color-divider:#233028;--color-border:#2e3d31;
+  --color-text:#cdd9cb;--color-text-muted:#748a71;--color-text-faint:#506050;
+  --color-text-inverse:#1a2218;
+  --color-primary:#4fa36b;--color-primary-hover:#348a55;--color-primary-active:#246b40;
+  --color-primary-highlight:#1e3828;
+  --color-blue:#5591c7;--color-blue-highlight:#3a4550;
+  --color-warning:#bb653b;--color-warning-highlight:#564942;
+  --color-error:#d163a7;--color-error-highlight:#4c3d46;
+  --color-gold:#e8af34;--color-gold-highlight:#4d4332;
+  --color-purple:#a86fdf;--color-purple-highlight:#4e4652;
+  --shadow-sm:0 1px 2px oklch(0 0 0/0.25);--shadow-md:0 4px 12px oklch(0 0 0/0.35);--shadow-lg:0 12px 32px oklch(0 0 0/0.45);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme]){
+  --color-bg:#111a12;--color-surface:#172019;--color-surface-2:#1d2a1f;
+  --color-surface-offset:#1b2520;--color-divider:#233028;--color-border:#2e3d31;
+  --color-text:#cdd9cb;--color-text-muted:#748a71;--color-text-faint:#506050;
+  --color-text-inverse:#1a2218;
+  --color-primary:#4fa36b;--color-primary-hover:#348a55;--color-primary-active:#246b40;
+  --color-primary-highlight:#1e3828;
+}}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth;scroll-padding-top:5rem}
+body{min-height:100dvh;line-height:1.6;font-family:var(--font-body);font-size:var(--text-base);color:var(--color-text);background:var(--color-bg);}
+img,svg{display:block;max-width:100%}
+h1,h2,h3,h4{text-wrap:balance;line-height:1.15}
+p,li{text-wrap:pretty;max-width:72ch}
+button{cursor:pointer;background:none;border:none;font:inherit;color:inherit}
+table{border-collapse:collapse;width:100%}
+a,button,[role="button"]{transition:color var(--transition-interactive),background var(--transition-interactive),border-color var(--transition-interactive),box-shadow var(--transition-interactive)}
+:focus-visible{outline:2px solid var(--color-primary);outline-offset:3px;border-radius:var(--radius-sm)}
+
+/* LAYOUT */
+.app-shell{display:grid;grid-template-columns:260px 1fr;grid-template-rows:auto 1fr;min-height:100dvh}
+.topbar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:var(--space-3) var(--space-6);background:var(--color-surface);border-bottom:1px solid oklch(from var(--color-text) l c h/0.1);position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm)}
+.logo{display:flex;align-items:center;gap:var(--space-3);font-family:var(--font-display);font-size:var(--text-lg);font-weight:400;color:var(--color-text);text-decoration:none}
+.logo svg{color:var(--color-primary)}
+.topbar-actions{display:flex;align-items:center;gap:var(--space-2)}
+.btn-icon{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:var(--radius-md);color:var(--color-text-muted)}
+.btn-icon:hover{background:var(--color-surface-offset);color:var(--color-text)}
+.badge-version{font-size:var(--text-xs);background:var(--color-primary-highlight);color:var(--color-primary);padding:2px 8px;border-radius:var(--radius-full);font-weight:600}
+
+/* SIDEBAR */
+.sidebar{background:var(--color-surface);border-right:1px solid oklch(from var(--color-text) l c h/0.08);padding:var(--space-6) var(--space-4);overflow-y:auto;position:sticky;top:3.75rem;height:calc(100dvh - 3.75rem);align-self:start}
+.sidebar-section{margin-bottom:var(--space-6)}
+.sidebar-label{font-size:var(--text-xs);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-text-faint);margin-bottom:var(--space-2);padding-left:var(--space-3)}
+.sidebar-nav{display:flex;flex-direction:column;gap:2px}
+.nav-item{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);font-size:var(--text-sm);color:var(--color-text-muted);text-decoration:none;cursor:pointer;border:none;background:none;text-align:left;width:100%}
+.nav-item:hover{background:var(--color-surface-offset);color:var(--color-text)}
+.nav-item.active{background:var(--color-primary-highlight);color:var(--color-primary);font-weight:600}
+.nav-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* MAIN CONTENT */
+.main-content{padding:var(--space-8) var(--space-10);max-width:900px}
+.page-header{margin-bottom:var(--space-8)}
+.page-title{font-family:var(--font-display);font-size:var(--text-xl);font-weight:400;color:var(--color-text);margin-bottom:var(--space-2)}
+.page-subtitle{font-size:var(--text-base);color:var(--color-text-muted);max-width:60ch}
+
+/* SECTIONS */
+.section{display:none}
+.section.active{display:block}
+
+/* TABLE CARDS */
+.table-card{background:var(--color-surface-2);border:1px solid oklch(from var(--color-text) l c h/0.1);border-radius:var(--radius-xl);overflow:hidden;box-shadow:var(--shadow-sm);margin-bottom:var(--space-8)}
+.table-card-header{padding:var(--space-5) var(--space-6);border-bottom:1px solid oklch(from var(--color-text) l c h/0.07);display:flex;align-items:center;gap:var(--space-3);background:var(--color-surface)}
+.table-icon{width:36px;height:36px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem}
+.table-title{font-size:var(--text-lg);font-weight:600;color:var(--color-text)}
+.table-desc{font-size:var(--text-sm);color:var(--color-text-muted);margin-top:2px}
+
+/* DATA TABLE */
+.data-table{width:100%;font-size:var(--text-sm)}
+.data-table thead{background:var(--color-surface-offset)}
+.data-table thead th{padding:var(--space-3) var(--space-4);text-align:left;font-weight:600;font-size:var(--text-xs);text-transform:uppercase;letter-spacing:0.06em;color:var(--color-text-muted);border-bottom:1px solid var(--color-divider)}
+.data-table tbody tr{border-bottom:1px solid oklch(from var(--color-text) l c h/0.06)}
+.data-table tbody tr:last-child{border-bottom:none}
+.data-table tbody tr:hover{background:var(--color-surface-offset)}
+.data-table td{padding:var(--space-3) var(--space-4);vertical-align:top}
+.data-table td:first-child{font-family:monospace;font-weight:600;color:var(--color-primary);font-size:var(--text-xs)}
+.data-table td:nth-child(2){color:var(--color-text-muted);font-size:var(--text-xs)}
+
+/* TYPE BADGES */
+.type-badge{display:inline-flex;align-items:center;gap:4px;font-size:var(--text-xs);font-weight:600;padding:2px 8px;border-radius:var(--radius-full);white-space:nowrap}
+.type-text{background:var(--color-blue-highlight);color:var(--color-blue)}
+.type-num{background:var(--color-gold-highlight);color:var(--color-gold)}
+.type-bool{background:var(--color-primary-highlight);color:var(--color-primary)}
+.type-enum{background:var(--color-purple-highlight);color:var(--color-purple)}
+.type-fk{background:var(--color-warning-highlight);color:var(--color-warning)}
+.type-json{background:var(--color-error-highlight);color:var(--color-error)}
+.type-date{background:var(--color-surface-offset);color:var(--color-text-muted)}
+.type-dec{background:var(--color-gold-highlight);color:var(--color-gold)}
+
+/* ENUM VALUES */
+.enum-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.enum-chip{font-size:0.65rem;background:var(--color-surface-offset);color:var(--color-text-muted);padding:2px 6px;border-radius:var(--radius-sm);font-family:monospace;font-weight:600;border:1px solid var(--color-border)}
+
+/* RULES SECTION */
+.rules-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);margin-bottom:var(--space-8)}
+.rule-card{background:var(--color-surface-2);border:1px solid oklch(from var(--color-text) l c h/0.1);border-radius:var(--radius-lg);padding:var(--space-5);box-shadow:var(--shadow-sm)}
+.rule-icon{font-size:1.4rem;margin-bottom:var(--space-2)}
+.rule-title{font-size:var(--text-sm);font-weight:700;color:var(--color-text);margin-bottom:var(--space-1)}
+.rule-desc{font-size:var(--text-sm);color:var(--color-text-muted);line-height:1.5}
+.rule-code{font-family:monospace;background:var(--color-surface-offset);padding:2px 6px;border-radius:var(--radius-sm);font-size:var(--text-xs);color:var(--color-primary)}
+
+/* OVERVIEW */
+.overview-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4);margin-bottom:var(--space-8)}
+.overview-card{background:var(--color-surface-2);border:1px solid oklch(from var(--color-text) l c h/0.1);border-radius:var(--radius-lg);padding:var(--space-5);box-shadow:var(--shadow-sm);cursor:pointer;transition:box-shadow var(--transition-interactive),border-color var(--transition-interactive)}
+.overview-card:hover{box-shadow:var(--shadow-md);border-color:var(--color-primary)}
+.ov-icon{width:40px;height:40px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;margin-bottom:var(--space-3);font-size:1.3rem}
+.ov-name{font-size:var(--text-sm);font-weight:700;color:var(--color-text);margin-bottom:2px}
+.ov-desc{font-size:var(--text-xs);color:var(--color-text-muted);line-height:1.5}
+.ov-count{display:inline-block;margin-top:var(--space-2);font-size:var(--text-xs);font-weight:600;color:var(--color-primary)}
+
+/* ALERT */
+.alert{display:flex;gap:var(--space-3);padding:var(--space-4);border-radius:var(--radius-lg);margin-bottom:var(--space-6);border:1px solid}
+.alert-warn{background:var(--color-warning-highlight);border-color:oklch(from var(--color-warning) l c h/0.3);color:var(--color-warning)}
+.alert-info{background:var(--color-primary-highlight);border-color:oklch(from var(--color-primary) l c h/0.3);color:var(--color-primary)}
+.alert-icon{font-size:1.1rem;flex-shrink:0;margin-top:2px}
+.alert-body p{font-size:var(--text-sm);line-height:1.5}
+.alert-body strong{font-weight:700}
+
+/* FK INDICATOR */
+.fk-link{color:var(--color-warning);font-family:monospace;font-size:var(--text-xs);font-weight:600}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .app-shell{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .main-content{padding:var(--space-6) var(--space-4)}
+  .overview-grid{grid-template-columns:1fr 1fr}
+  .rules-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <a class="logo" href="#" onclick="showSection('overview');return false">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-label="Pesca Yucatán">
+      <rect width="28" height="28" rx="7" fill="var(--color-primary)"/>
+      <path d="M5 14 Q10 8 14 14 Q18 20 23 14" stroke="white" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <circle cx="22" cy="10" r="2" fill="white" opacity="0.7"/>
+      <path d="M6 19 Q8 17 10 19" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.6"/>
+    </svg>
+    BD Pesca Yucatán
+    <span class="badge-version">v1.0</span>
+  </a>
+  <div class="topbar-actions">
+    <button class="btn-icon" onclick="toggleTheme()" data-theme-toggle aria-label="Cambiar tema">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<nav class="sidebar" aria-label="Navegación principal">
+  <div class="sidebar-section">
+    <div class="sidebar-label">General</div>
+    <div class="sidebar-nav">
+      <button class="nav-item active" onclick="showSection('overview')" data-section="overview">
+        <span class="nav-dot" style="background:var(--color-primary)"></span>Vista General
+      </button>
+      <button class="nav-item" onclick="showSection('reglas')" data-section="reglas">
+        <span class="nav-dot" style="background:var(--color-warning)"></span>Reglas de Oro
+      </button>
+    </div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Tablas</div>
+    <div class="sidebar-nav">
+      <button class="nav-item" onclick="showSection('pez')" data-section="pez">
+        <span class="nav-dot" style="background:#1a6b3a"></span>🐟 Pez
+      </button>
+      <button class="nav-item" onclick="showSection('zona')" data-section="zona">
+        <span class="nav-dot" style="background:#006494"></span>📍 Zona
+      </button>
+      <button class="nav-item" onclick="showSection('regulacion')" data-section="regulacion">
+        <span class="nav-dot" style="background:#7a39bb"></span>⚖️ Regulación
+      </button>
+      <button class="nav-item" onclick="showSection('veda')" data-section="veda">
+        <span class="nav-dot" style="background:#a12c7b"></span>🚫 Periodo Veda
+      </button>
+      <button class="nav-item" onclick="showSection('arte')" data-section="arte">
+        <span class="nav-dot" style="background:#964219"></span>🎣 Arte Pesca
+      </button>
+      <button class="nav-item" onclick="showSection('similitud')" data-section="similitud">
+        <span class="nav-dot" style="background:#b07a00"></span>🔍 Similitud Especie
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main-content">
+
+  <!-- OVERVIEW -->
+  <section id="section-overview" class="section active">
+    <div class="page-header">
+      <h1 class="page-title">Guía de Llenado</h1>
+      <p class="page-subtitle">Base de datos para la plataforma de pesca de Yucatán. Respeta los formatos y tipos para que Spring Boot procese la información correctamente.</p>
+    </div>
+    <div class="alert alert-info">
+      <span class="alert-icon">ℹ️</span>
+      <div class="alert-body"><p><strong>6 tablas relacionadas</strong> componen el modelo de datos. Haz clic en cualquier tabla para ver su estructura completa.</p></div>
+    </div>
+    <div class="overview-grid">
+      <div class="overview-card" onclick="showSection('pez')">
+        <div class="ov-icon" style="background:#cde0d4">🐟</div>
+        <div class="ov-name">Pez</div>
+        <div class="ov-desc">Perfil biológico de la especie. No cambia según la ley.</div>
+        <span class="ov-count">10 campos</span>
+      </div>
+      <div class="overview-card" onclick="showSection('zona')">
+        <div class="ov-icon" style="background:var(--color-blue-highlight)">📍</div>
+        <div class="ov-name">Zona</div>
+        <div class="ov-desc">Geografía y jurisdicción donde aplican las reglas.</div>
+        <span class="ov-count">5 campos</span>
+      </div>
+      <div class="overview-card" onclick="showSection('regulacion')">
+        <div class="ov-icon" style="background:var(--color-purple-highlight)">⚖️</div>
+        <div class="ov-name">Regulación</div>
+        <div class="ov-desc">Motor de reglas: relaciona Pez, Zona y tipo de pescador.</div>
+        <span class="ov-count">11 campos</span>
+      </div>
+      <div class="overview-card" onclick="showSection('veda')">
+        <div class="ov-icon" style="background:var(--color-error-highlight)">🚫</div>
+        <div class="ov-name">Periodo Veda</div>
+        <div class="ov-desc">Restricciones temporales asociadas a una regulación.</div>
+        <span class="ov-count">6 campos</span>
+      </div>
+      <div class="overview-card" onclick="showSection('arte')">
+        <div class="ov-icon" style="background:var(--color-warning-highlight)">🎣</div>
+        <div class="ov-name">Arte Pesca</div>
+        <div class="ov-desc">Instrumentos permitidos o prohibidos por regulación.</div>
+        <span class="ov-count">4 campos</span>
+      </div>
+      <div class="overview-card" onclick="showSection('similitud')">
+        <div class="ov-icon" style="background:var(--color-gold-highlight)">🔍</div>
+        <div class="ov-name">Similitud Especie</div>
+        <div class="ov-desc">Evita confusiones entre especies protegidas y legales.</div>
+        <span class="ov-count">4 campos</span>
+      </div>
+    </div>
+    <div class="table-card">
+      <div class="table-card-header">
+        <div class="table-icon" style="background:var(--color-surface-offset)">🔑</div>
+        <div>
+          <div class="table-title">Leyenda de Tipos de Datos</div>
+          <div class="table-desc">Referencia rápida para interpretar los campos</div>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Badge</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><span class="type-badge type-num">Numérico</span></td><td>Integer / Long</td><td>Número entero. Para IDs y cantidades.</td></tr>
+          <tr><td><span class="type-badge type-dec">Decimal</span></td><td>BigDecimal</td><td>Número con punto decimal (usa <strong>.</strong> no coma). Ej: 36.3</td></tr>
+          <tr><td><span class="type-badge type-text">Texto</span></td><td>String / VARCHAR</td><td>Cadena de texto libre.</td></tr>
+          <tr><td><span class="type-badge type-bool">Booleano</span></td><td>Boolean</td><td>Solo <code>TRUE</code> o <code>FALSE</code>.</td></tr>
+          <tr><td><span class="type-badge type-enum">Enum</span></td><td>Enum / VARCHAR</td><td>Valor de lista cerrada. <strong>Siempre en MAYÚSCULAS.</strong></td></tr>
+          <tr><td><span class="type-badge type-fk">FK (ID)</span></td><td>Foreign Key</td><td>ID que referencia otra tabla. Debe existir previamente.</td></tr>
+          <tr><td><span class="type-badge type-json">JSON</span></td><td>JSON / TEXT</td><td>Estructura JSON. Ej: coordenadas de polígono.</td></tr>
+          <tr><td><span class="type-badge type-date">Fecha</span></td><td>Integer (Mes/Día)</td><td>Usar solo números: Mes 1–12, Día 1–31.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TABLA PEZ -->
+  <section id="section-pez" class="section">
+    <div class="page-header">
+      <h1 class="page-title">🐟 Tabla: Pez</h1>
+      <p class="page-subtitle">Perfil biológico de la especie. Esta información no cambia según regulaciones.</p>
+    </div>
+    <div class="table-card">
+      <div class="table-card-header">
+        <div class="table-icon" style="background:#cde0d4">🐟</div>
+        <div>
+          <div class="table-title">Pez — Perfil Biológico</div>
+          <div class="table-desc">10 campos · Tabla maestra de especies</div>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción y Ejemplo</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>id</td>
+            <td><span class="type-badge type-num">Numérico</span></td>
+            <td>Identificador único. Ej: <span class="rule-code">1</span>, <span class="rule-code">2</span>, <span class="rule-code">3</span></td>
+          </tr>
+          <tr>
+            <td>nombre_comun</td>
+            <td><span class="type-badge type-text">Texto</span></td>
+            <td>Nombre popular. Ej: <span class="rule-code">Mero Americano</span></td>
+          </tr>
+          <tr>
+            <td>nombre_cientifico</td>
+            <td><span class="type-badge type-text">Texto</span></td>
+            <td>Nombre en latín (itálica). Ej: <span class="rule-code">Epinephelus morio</span></td>
+          </tr>
+          <tr>
+            <td>nombre_maya</td>
+            <td><span class="type-badge type-text">Texto</span></td>
+            <td>Nombre local en maya. Ej: <span class="rule-code">X'kay</span></td>
+          </tr>
+          <tr>
+            <td>descripcion</td>
+            <td><span class="type-badge type-text">Texto largo</span></td>
+            <td>Características físicas y hábitat general.</td>
+          </tr>
+          <tr>
+            <td>riesgo_ciguatera</td>
+            <td><span class="type-badge type-enum">Enum</span></td>
+            <td>
+              Nivel de riesgo de ciguatera.
+              <div class="enum-chips">
+                <span class="enum-chip">NULO</span>
+                <span class="enum-chip">BAJO</span>
+                <span class="enum-chip">MEDIO</span>
+                <span class="enum-chip">ALTO</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>es_invasiva</td>
+            <td><span class="type-badge type-bool">Booleano</span></td>
+            <td><span class="rule-code">TRUE</span> si es especie exótica (ej. Pez León). <span class="rule-code">FALSE</span> si nativa.</td>
+          </tr>
+          <tr>
+            <td>es_protegida</td>
+            <td><span class="type-badge type-bool">Booleano</span></td>
+            <td><span class="rule-code">TRUE</span> si está en la NOM-059 (peligro de extinción).</td>
+          </tr>
+          <tr>
+            <td>tipo_agua</td>
+            <td><span class="type-badge type-enum">Enum</span></td>
+            <td>
+              Hábitat acuático de la especie.
+              <div class="enum-chips">
+                <span class="enum-chip">DULCE</span>
+                <span class="enum-chip">SALADA</span>
+                <span class="enum-chip">SALOBRE</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>migratorio</td>
+            <td><span class="type-badge type-bool">Booleano</span></td>
+            <td><span class="rule-code">TRUE</span> si viaja entre mar y río (ej. Sábalo). <span class="rule-code">FALSE</span> si residente.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="alert alert-warn">
+      <span class="alert-icon">⚠️</span>
+      <div class="alert-body"><p><strong>Consistencia de agua:</strong> Si <code>tipo_agua = DULCE</code>, la zona asociada en Regulación debe ser <code>categoria_zona = CONTINENTAL</code>.</p></div>
+    </div>
+  </section>
+
+  <!-- TABLA ZONA -->
+  <section id="section-zona" class="section">
+    <div class="page-header">
+      <h1 class="page-title">📍 Tabla: Zona</h1>
+      <p class="page-subtitle">Define dónde se aplican las reglas. Ahora combina jurisdicción, macro-región, restricción pesquera e hidrología.</p>
+    </div>
+    <div class="alert alert-info">
+      <span class="alert-icon">🧭</span>
+      <div class="alert-body"><p><strong>Nueva estructura:</strong> la entidad Zona ahora describe ubicación operativa, tipo de restricción y contexto hídrico. Esto permite cruzar mejor especies costeras, oceánicas, estuarinas y continentales.</p></div>
+    </div>
+    <div class="table-card">
+      <div class="table-card-header">
+        <div class="table-icon" style="background:var(--color-blue-highlight)">📍</div>
+        <div>
+          <div class="table-title">Zona — Geografía, Restricción y Jurisdicción</div>
+          <div class="table-desc">8 campos · Estructura actualizada para clasificación territorial</div>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción y Ejemplo</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>id</td>
+            <td><span class="type-badge type-num">Numérico</span></td>
+            <td>Identificador único de la zona. Ej: <span class="rule-code">1</span></td>
+          </tr>
+          <tr>
+            <td>nombre</td>
+            <td><span class="type-badge type-text">Texto</span></td>
+            <td>Nombre oficial u operativo de la zona. Ej: <span class="rule-code">Litoral Norte de Yucatán</span>, <span class="rule-code">Ría Lagartos</span></td>
+          </tr>
+          <tr>
+            <td>macro_zona</td>
+            <td><span class="type-badge type-enum">Enum</span></td>
+            <td>
+              Región macro para ordenar reglas espaciales.
+              <div class="enum-chips">
+                <span class="enum-chip">PONIENTE</span>
+                <span class="enum-chip">CENTRO</span>
+                <span class="enum-chip">ORIENTE</span>
+                <span class="enum-chip">OCEANICA</span>
+                <span class="enum-chip">CONTINENTAL</span>
+              </div>
+              <br><strong>PONIENTE:</strong> desde Celestún hasta Progreso. <strong>CENTRO:</strong> de Chicxulub a Telchac. <strong>ORIENTE:</strong> de Dzilam a El Cuyo. <strong>OCEANICA:</strong> Banco de Campeche y mar abierto. <strong>CONTINENTAL:</strong> cenotes y tierra firme.
+            </td>
+          </tr>
+          <tr>
+            <td>tipo_restriccion</td>
+            <td><span class="type-badge type-enum">Enum</span></td>
+            <td>
+              Nivel operativo de restricción pesquera.
+              <div class="enum-chips">
+                <span class="enum-chip">LIBRE</span>
+                <span class="enum-chip">ANP</span>
+                <span class="enum-chip">REFUGIO_PESQUERO</span>
+                <span class="enum-chip">PROHIBIDA</span>
+              </div>
+              <br><strong>LIBRE:</strong> solo aplican vedas nacionales y tallas mínimas. <strong>ANP:</strong> área con plan de manejo. <strong>REFUGIO_PESQUERO:</strong> recuperación de biomasa con reglas estrictas. <strong>PROHIBIDA:</strong> veda permanente o acceso no permitido.
+            </td>
+          </tr>
+          <tr>
+            <td>categoria_hidrica</td>
+            <td><span class="type-badge type-enum">Enum</span></td>
+            <td>
+              Tipo hidrológico principal de la zona.
+              <div class="enum-chips">
+                <span class="enum-chip">OCEANICA</span>
+                <span class="enum-chip">COSTERA</span>
+                <span class="enum-chip">ESTUARINA</span>
+                <span class="enum-chip">CONTINENTAL</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>es_anp</td>
+            <td><span class="type-badge type-bool">Booleano</span></td>
+            <td><span class="rule-code">TRUE</span> si la zona está dentro de un Área Natural Protegida. <span class="rule-code">FALSE</span> si no lo está.</td>
+          </tr>
+          <tr>
+            <td>municipio_sede</td>
+            <td><span class="type-badge type-text">Texto</span></td>
+            <td>Municipio principal asociado a la administración o acceso. Ej: <span class="rule-code">Celestún</span>, <span class="rule-code">Progreso</span>, <span class="rule-code">Tizimín</span></td>
+          </tr>
+          <tr>
+            <td>notas_especificas</td>
+            <td><span class="type-badge type-text">Texto largo</span></td>
+            <td>Observaciones especiales de manejo, acceso o restricción. Ej: <span class="rule-code">Zona núcleo sin pesca</span>, <span class="rule-code">Refugio pesquero parcial temporal</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="alert alert-warn">
+      <span class="alert-icon">⚠️</span>
+      <div class="alert-body"><p><strong>Consistencia hídrica:</strong> si una especie en la tabla Pez tiene <code>tipo_agua = DULCE</code>, la regulación debe apuntar a una Zona con <code>categoria_hidrica = CONTINENTAL</code>.</p></div>
+    </div>
+  </section>
+
+  <!-- TABLA REGULACION -->
+  <section id="section-regulacion" class="section">
+    <div class="page-header">
+      <h1 class="page-title">⚖️ Tabla: Regulación</h1>
+      <p class="page-subtitle">El motor de reglas del sistema. Relaciona un Pez con una Zona y un tipo de pescador.</p>
+    </div>
+    <div class="alert alert-warn">
+      <span class="alert-icon">🔗</span>
+      <div class="alert-body"><p><strong>Integridad referencial:</strong> <code>pez_id</code> y <code>zona_id</code> deben existir previamente en sus respectivas tablas antes de crear una regulación.</p></div>
+    </div>
+    <div class="table-card">
+      <div class="table-card-header">
+        <div class="table-icon" style="background:var(--color-purple-highlight)">⚖️</div>
+        <div>
+          <div class="table-title">Regulación — Motor de Reglas</div>
+          <div class="table-desc">11 campos · Tabla central del modelo relacional</div>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción y Ejemplo</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>id</td>
+            <td><span class="type-badge type-num">Numérico</span></td>
+            <td>Identificador único de la regulación.</td>
+          </tr>
+          <tr>
+            <td>pez_id</td>
+            <td><span class="type-badge type-fk">FK (ID)</span></td>
+            <td>ID del pez en la tabla Pez. <span class="fk-link">→ Tabla: Pez</span></td>
+          </tr>
+          <tr>
+            <td>zona_id</td>
+            <td><span class="type-badge type-fk">FK (ID)</span></td>
+            <td>ID de la zona en la tabla Zona. <span class="fk-link">→ Tabla: Zona</span></td>
+          </tr>
+          <tr>
+            <td>categoria_pesca</td>
+            <td><span class="type-badge type-enum">Enum</span></td>
+            <td>
+              Tipo de actividad pesquera.
+              <div class="enum-chips">
+                <span class="enum-chip">DEPORTIVA</span>
+                <span class="enum-chip">COMERCIAL</span>
+                <span class="enum-chip">CONSUMO_DOMESTICO</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>talla_minima</td>
+            <td><span class="type-badge type-dec">Decimal</span></td>
+            <td>En centímetros. Usa punto decimal. Ej: <span class="rule-code">36.3</span></td>
+          </tr>
+          <tr>
+            <td>talla_maxima</td>
+            <td><span class="type-badge type-dec">Decimal</span></td>
+            <td>Límite superior para proteger reproductores. Campo <em>opcional</em>.</td>
+          </tr>
+          <tr>
+            <td>tipo_medicion</td>
+            <td><span class="type-badge type-enum">Enum</span></td>
+            <td>
+              Método de medición de la talla.
+              <div class="enum-chips">
+                <span class="enum-chip">LONGITUD_TOTAL</span>
+                <span class="enum-chip">LONGITUD_HORQUILLA</span>
+                <span class="enum-chip">LONGITUD_ESTANDAR</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>cuota_diaria</td>
+            <td><span class="type-badge type-num">Entero</span></td>
+            <td>Número de peces permitidos por día. Ej: <span class="rule-code">5</span></td>
+          </tr>
+          <tr>
+            <td>requiere_permiso</td>
+            <td><span class="type-badge type-bool">Booleano</span></td>
+            <td><span class="rule-code">TRUE</span> si es obligatorio el carnet de pesca.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TABLA VEDA -->
+  <section id="section-veda" class="section">
+    <div class="page-header">
+      <h1 class="page-title">🚫 Tabla: Periodo Veda</h1>
+      <p class="page-subtitle">Restricciones temporales. Una Regulación puede tener varias vedas (ej. primavera y otoño).</p>
+    </div>
+    <div class="table-card">
+      <div class="table-card-header">
+        <div class="table-icon" style="background:var(--color-error-highlight)">🚫</div>
+        <div>
+          <div class="table-title">Periodo Veda — Restricciones Temporales</div>
+          <div class="table-desc">6 campos · Relación N:1 con Regulación</div>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción y Ejemplo</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>id</td>
+            <td><span class="type-badge type-num">Numérico</span></td>
+            <td>Identificador único del periodo de veda.</td>
+          </tr>
+          <tr>
+            <td>regulacion_id</td>
+            <td><span class="type-badge type-fk">FK (ID)</span></td>
+            <td>ID de la regulación a la que pertenece. <span class="fk-link">→ Tabla: Regulación</span></td>
+          </tr>
+          <tr>
+            <td>tipo_veda</td>
+            <td><span class="type-badge type-enum">Enum</span></td>
+            <td>
+              <div class="enum-chips">
+                <span class="enum-chip">FIJA</span>
+                <span class="enum-chip">VARIABLE</span>
+              </div>
+              <br><strong>FIJA:</strong> siempre las mismas fechas. <strong>VARIABLE:</strong> cambia por decreto oficial.
+            </td>
+          </tr>
+          <tr>
+            <td>mes_inicio / dia_inicio</td>
+            <td><span class="type-badge type-date">Fecha</span></td>
+            <td>Solo números. Mes: <span class="rule-code">1</span>–<span class="rule-code">12</span>, Día: <span class="rule-code">1</span>–<span class="rule-code">31</span>. Ej: mes <span class="rule-code">3</span>, día <span class="rule-code">15</span></td>
+          </tr>
+          <tr>
+            <td>mes_fin / dia_fin</td>
+            <td><span class="type-badge type-date">Fecha</span></td>
+            <td>Misma lógica que la fecha de inicio.</td>
+          </tr>
+          <tr>
+            <td>fuente_dof</td>
+            <td><span class="type-badge type-text">Texto (URL)</span></td>
+            <td>Link al Diario Oficial de la Federación que avala la veda.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TABLA ARTE PESCA -->
+  <section id="section-arte" class="section">
+    <div class="page-header">
+      <h1 class="page-title">🎣 Tabla: Arte Pesca</h1>
+      <p class="page-subtitle">Especifica qué instrumentos se pueden usar (o están prohibidos) para una regulación.</p>
+    </div>
+    <div class="table-card">
+      <div class="table-card-header">
+        <div class="table-icon" style="background:var(--color-warning-highlight)">🎣</div>
+        <div>
+          <div class="table-title">Arte Pesca — Herramientas Permitidas/Prohibidas</div>
+          <div class="table-desc">4 campos · Relación N:1 con Regulación</div>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción y Ejemplo</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>id</td>
+            <td><span class="type-badge type-num">Numérico</span></td>
+            <td>Identificador único.</td>
+          </tr>
+          <tr>
+            <td>regulacion_id</td>
+            <td><span class="type-badge type-fk">FK (ID)</span></td>
+            <td>ID de la regulación a la que aplica. <span class="fk-link">→ Tabla: Regulación</span></td>
+          </tr>
+          <tr>
+            <td>nombre</td>
+            <td><span class="type-badge type-text">Texto</span></td>
+            <td>Ej: <span class="rule-code">Anzuelo de círculo</span>, <span class="rule-code">Red de enmalle</span>, <span class="rule-code">Arpón</span></td>
+          </tr>
+          <tr>
+            <td>es_prohibido</td>
+            <td><span class="type-badge type-bool">Booleano</span></td>
+            <td><span class="rule-code">TRUE</span> si la herramienta es ilegal para esa categoría de pesca.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TABLA SIMILITUD -->
+  <section id="section-similitud" class="section">
+    <div class="page-header">
+      <h1 class="page-title">🔍 Tabla: Especie Similitud</h1>
+      <p class="page-subtitle">Seguridad del usuario: ayuda a no confundir especies protegidas con legales.</p>
+    </div>
+    <div class="table-card">
+      <div class="table-card-header">
+        <div class="table-icon" style="background:var(--color-gold-highlight)">🔍</div>
+        <div>
+          <div class="table-title">Especie Similitud — Prevención de Confusiones</div>
+          <div class="table-desc">4 campos · Relación N:N entre especies de Pez</div>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción y Ejemplo</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>id</td>
+            <td><span class="type-badge type-num">Numérico</span></td>
+            <td>Identificador único.</td>
+          </tr>
+          <tr>
+            <td>pez_id_principal</td>
+            <td><span class="type-badge type-fk">FK (ID)</span></td>
+            <td>El pez que se está consultando. <span class="fk-link">→ Tabla: Pez</span></td>
+          </tr>
+          <tr>
+            <td>pez_id_similar</td>
+            <td><span class="type-badge type-fk">FK (ID)</span></td>
+            <td>El pez con el que suele confundirse. <span class="fk-link">→ Tabla: Pez</span></td>
+          </tr>
+          <tr>
+            <td>clave_distintiva</td>
+            <td><span class="type-badge type-text">Texto</span></td>
+            <td>Ej: <span class="rule-code">El similar tiene una mancha negra en la aleta dorsal</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- REGLAS DE ORO -->
+  <section id="section-reglas" class="section">
+    <div class="page-header">
+      <h1 class="page-title">⚠️ Reglas de Oro</h1>
+      <p class="page-subtitle">Normas críticas para el llenado correcto. Incumplirlas causará errores en la API de Spring Boot.</p>
+    </div>
+    <div class="rules-grid">
+      <div class="rule-card">
+        <div class="rule-icon">🔗</div>
+        <div class="rule-title">Integridad de IDs</div>
+        <div class="rule-desc">No inventes IDs. Si registras una regulación para el "Mero", el <span class="rule-code">pez_id</span> debe coincidir exactamente con el <span class="rule-code">id</span> de ese pez en la tabla Pez.</div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-icon">🔢</div>
+        <div class="rule-title">Decimales con Punto</div>
+        <div class="rule-desc">Usa siempre el <strong>punto (.)</strong> y no la coma (,) para medidas decimales. Correcto: <span class="rule-code">30.5</span> — Incorrecto: <code>30,5</code></div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-icon">🔠</div>
+        <div class="rule-title">Enums en MAYÚSCULAS</div>
+        <div class="rule-desc">Todos los campos Enum deben escribirse en MAYÚSCULAS para que el sistema los reconozca. Ej: <span class="rule-code">COMERCIAL</span>, <span class="rule-code">SALADA</span>, <span class="rule-code">FIJA</span>.</div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-icon">🌊</div>
+        <div class="rule-title">Consistencia Agua ↔ Zona</div>
+        <div class="rule-desc">Si el pez tiene <span class="rule-code">tipo_agua: DULCE</span> (cenotes), la zona asociada debe ser <span class="rule-code">categoria_zona: CONTINENTAL</span>. No mezclar tipos.</div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-icon">📋</div>
+        <div class="rule-title">Orden de Registro</div>
+        <div class="rule-desc">Registra en este orden: <strong>1.</strong> Pez → <strong>2.</strong> Zona → <strong>3.</strong> Regulación → <strong>4.</strong> Veda / Arte / Similitud. Las FKs deben existir antes.</div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-icon">📅</div>
+        <div class="rule-title">Fechas como Números</div>
+        <div class="rule-desc">En Periodo Veda, las fechas se registran como enteros. Mes: <span class="rule-code">1</span> a <span class="rule-code">12</span>. Día: <span class="rule-code">1</span> a <span class="rule-code">31</span>. No usar texto ni formato DD/MM.</div>
+      </div>
+    </div>
+    <div class="alert alert-info">
+      <span class="alert-icon">💡</span>
+      <div class="alert-body"><p><strong>Consejo:</strong> Antes de capturar una regulación, verifica que el <code>pez_id</code> y el <code>zona_id</code> ya existan en sus respectivas tablas. El sistema Spring Boot validará las claves foráneas al momento de guardar.</p></div>
+    </div>
+  </section>
+
+</main>
+</div>
+
+<script>
+(function(){
+  const d=document.documentElement;
+  let theme=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  d.setAttribute('data-theme',theme);
+  const btn=document.querySelector('[data-theme-toggle]');
+  if(btn){
+    btn.innerHTML=theme==='dark'
+      ?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+      :'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  }
+})();
+
+function toggleTheme(){
+  const d=document.documentElement;
+  const t=d.getAttribute('data-theme')==='dark'?'light':'dark';
+  d.setAttribute('data-theme',t);
+  const btn=document.querySelector('[data-theme-toggle]');
+  if(btn){
+    btn.innerHTML=t==='dark'
+      ?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+      :'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+    btn.setAttribute('aria-label','Cambiar a modo '+(t==='dark'?'claro':'oscuro'));
+  }
+}
+
+function showSection(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const sec=document.getElementById('section-'+id);
+  if(sec)sec.classList.add('active');
+  document.querySelectorAll('[data-section="'+id+'"]').forEach(n=>n.classList.add('active'));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>

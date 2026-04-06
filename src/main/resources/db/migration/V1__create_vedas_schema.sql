@@ -2,15 +2,17 @@
 
 -- 1. Tabla Pez
 CREATE TABLE IF NOT EXISTS pez (
-    id          BIGINT PRIMARY KEY,
-    nombre_comun      VARCHAR(100) NOT NULL,
-    especie      VARCHAR(100) NOT NULL,
-    nombre_maya        VARCHAR(30),
-    talla_minima        VARCHAR(200),
-    habitat        VARCHAR(200),
-    tecnica_recomendada   VARCHAR(200),
-    zona                VARCHAR(200) NOT NULL
-    );
+    id                  BIGINT PRIMARY KEY,
+    nombre_comun        VARCHAR(100) NOT NULL,
+    nombre_cientifico   VARCHAR(150),
+    nombre_maya         VARCHAR(50),
+    descripcion         TEXT,
+    riesgo_ciguatera    VARCHAR(10),
+    es_invasiva         BOOLEAN DEFAULT FALSE,
+    es_protegida        BOOLEAN DEFAULT FALSE,
+    tipo_agua           VARCHAR(10),
+    migratorio          BOOLEAN DEFAULT FALSE
+);
 
 -- 2. Tabla Especie Veda
 CREATE TABLE IF NOT EXISTS especie_veda (

@@ -22,16 +22,11 @@ public class PezController {
         return pezService.listarTodosLosPeces();
     }
 
-    @GetMapping("/temporada")
-    public List<Pez> obtenerPeces(@RequestParam(required = false) String zona) {
-        // Al ser 'required = false', la API sigue funcionando si no mandan nada
-        return pezService.buscarPeces(zona);
-
-    }
     @GetMapping("/{id}")
     public Pez obtenerUno(@PathVariable Long id) {
         return pezService.obtenerPorId(id);
     }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED) // Devuelve código 201 sitodo sale bien
     public Pez registrarPez(@RequestBody Pez nuevoPez) {
