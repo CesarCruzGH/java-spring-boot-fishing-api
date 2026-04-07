@@ -60,7 +60,8 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers("/actuator/health", "/actuator/info")
                         .permitAll()
-
+                        .requestMatchers("/api/v1/regulaciones", "/api/v1/regulaciones/pez/**")
+                        .permitAll()
                         // Swagger UI (si se implementa)
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
                         .permitAll()

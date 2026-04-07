@@ -5,7 +5,6 @@ Guidelines for agentic coding systems working in this repository.
 ## Project Overview
 
 **Main Application**: Spring Boot 3.5 REST API for managing fishing seasons (vedas) and marine species in Yucatán, Mexico.
-**PDF Extractor**: Python FastAPI microservice for extracting tables from PDF documents.
 **Frontend**: (Planned) React + Vite + TypeScript SPA
 
 ---
@@ -40,14 +39,6 @@ Guidelines for agentic coding systems working in this repository.
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=prod
 
 # View test reports: target/surefire-reports/*.txt
-```
-
-### PDF Extractor (Python FastAPI)
-
-```bash
-cd pdf-extractor
-.\venv\Scripts\uvicorn main:app --reload --port 8000
-.\venv\Scripts\pytest
 ```
 
 ---
@@ -91,6 +82,7 @@ com.pescayucatan.api_pesca_merida
 - Use `@RequiredArgsConstructor` (Lombok) for constructor injection
 - Avoid `@Autowired` on fields; prefer constructor injection
 - Use `@Slf4j` (Lombok) for logging
+- Use `@Transactional` for methods modifying data
 
 #### Error Handling
 - Use custom exceptions extending `RuntimeException`
@@ -114,8 +106,28 @@ public class GlobalExceptionHandler {
 - Use records for simple DTOs/CSV rows - immutable by default
 
 ```java
-public record VedaCsvRow(Integer pezId, String nombreComun, String especieCientifica) {
-    public static VedaCsvRow fromCsvLine(String[] cells) { /* ... */ }
+public record PeriodoVedaCsvRow(
+    Long id,
+    Long regulacionId,
+    String tipoVeda,
+    Integer mesInicio,
+    Integer diaInicio,
+    Integer mesFin,
+    Integer diaFin,
+    String fuenteDof
+) {
+    public static PeriodoVedaCsvRow fromCsvLine(String[] cols) {
+        return new PeriodoVedaCsvRow(
+            parseLongOrNull(cols[0]),
+            parseLongOrNull(cols[1]),
+            cols[2].trim(),
+            parseIntOrNull(cols[3]),
+            parseIntOrNull(cols[4]),
+            parseIntOrNull(cols[5]),
+            parseIntOrNull(cols[6]),
+            cols[7].trim()
+        );
+    }
 }
 ```
 
@@ -126,14 +138,7 @@ public record VedaCsvRow(Integer pezId, String nombreComun, String especieCienti
 - Use Arrange-Act-Assert (AAA) pattern
 - Test file location: `src/test/java/...` mirrors `src/main/java/...`
 
-### 2.2 Python - FastAPI (PDF Extractor)
-
-- Files: snake_case, Functions: snake_case with verb prefix
-- Classes: PascalCase, Constants: UPPER_SNAKE_CASE
-- Type hints: Required for function signatures
-- Raise `HTTPException` for API errors, never expose raw exception details
-
-### 2.3 General Guidelines
+### 2.2 General Guidelines
 
 #### API Design
 - Use plural nouns: `/api/v1/peces`
@@ -141,12 +146,13 @@ public record VedaCsvRow(Integer pezId, String nombreComun, String especieCienti
 - Return appropriate status codes: 200, 201, 404, 500
 
 #### Database Conventions
-- Table names: singular, lowercase (`pez`, `especie_veda`)
+- Table names: singular, lowercase (`pez`, `regulacion`)
 - Column names: snake_case (`nombre_comun`, `talla_minima`)
 
 #### Logging
-- Use structured logging with meaningful messages
+- Use `@Slf4j` for structured logging
 - Include relevant context (IDs, file names, row numbers)
+- Use emoji sparingly (only in data pipeline logs for visibility)
 
 ---
 
@@ -162,13 +168,18 @@ cors.allowed.origins="http://localhost:3000","http://localhost:5173"
 ### Flyway Migrations
 - Location: `src/main/resources/db/migration/`
 - Naming: `V{version}__{description}.sql` (e.g., `V1__create_vedas_schema.sql`)
+- Migration files:
+  - `V1__create_vedas_schema.sql` - Core tables: `pez`, `zona`, `regulacion`, `periodo_veda`, `arte_pesca`, `ingestions_logs`
+  - `V2__create_auth_schema.sql` - Auth tables: `users`, `roles`, `user_roles`
 
 ---
 
 ## 4. Environment Setup
 
 ### Prerequisites
-- Java 21+, Maven 3.9+, Python 3.10+ (PDF extractor), Node.js 18+ (frontend)
+- Java 21+
+- Maven 3.9+
+- Node.js 18+ (frontend - planned)
 
 ### Quick Start
 ```bash
@@ -181,7 +192,31 @@ cors.allowed.origins="http://localhost:3000","http://localhost:5173"
 
 ---
 
-## 5. Common Tasks
+## 5. Database Schema
+
+### Entity Relationships
+```
+zona (1) ---> (N) regulacion
+pez (1) ---> (N) regulacion
+regulacion (1) ---> (N) periodo_veda
+regulacion (1) ---> (N) arte_pesca
+users (N) <---> (N) roles (via user_roles)
+```
+
+### Core Tables
+
+| Table | Description |
+|-------|-------------|
+| `pez` | Marine species catalog |
+| `zona` | Geographic fishing zones |
+| `regulacion` | Fishing regulations per species/zone |
+| `periodo_veda` | Veda (fishing ban) periods |
+| `arte_pesca` | Fishing gear per regulation |
+| `ingestions_logs` | CSV ingestion audit log |
+
+---
+
+## 6. Common Tasks
 
 ### Adding a New Entity
 1. Create model class with JPA annotations
@@ -197,6 +232,22 @@ cors.allowed.origins="http://localhost:3000","http://localhost:5173"
 2. Update corresponding `*CsvRow` record
 3. Add test cases for new schema
 
+### Data Ingestion Pipeline
+1. CSV files downloaded from Google Sheets URLs in `application.properties`
+2. SHA-256 hash computed for change detection
+3. If new content, parse with `CsvParserService`
+4. Upsert records via repository
+5. Log result in `ingestions_logs` table
+
 ---
 
-Last updated: 2026-04-02
+## 7. Security
+
+- HTTP Basic Auth via Spring Security
+- Role-based access: PUBLIC (species queries) vs ADMIN (ingestion, metrics)
+- Default dev user: `admin` / `admin123` (H2 only)
+- Production must disable `DataSeeder` and use proper credentials
+
+---
+
+Last updated: 2026-04-07
