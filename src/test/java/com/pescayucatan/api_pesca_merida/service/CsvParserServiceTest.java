@@ -44,9 +44,9 @@ class CsvParserServiceTest {
         void testParseEspecies_HappyPath() {
             // Arrange
             String csv = """
-                ID,NOMBRE COMÚN,ESPECIE,NOMBRE MAYA,TALLA MÍNIMA,HÁBITAT,TÉCNICA RECOMENDADA,ZONA
-                5,Mero,Epinephelus morio,Xlavita,40 cm,Arrecifes,Curricán,Golfo de México
-                7,Huachinango,Lutjanus campechanus,K'aan xook,25 cm,Rocosos,Línea de mano,Caribe
+                ID,NOMBRE COMÚN,NOMBRE CIENTÍFICO,NOMBRE MAYA,DESCRIPCIÓN,RIESGO CIGUATERA,ES INVASIVA,ES PROTEGIDA,TIPO AGUA,MIGRATORIO
+                5,Mero,Epinephelus morio,Xlavita,Pez de arrecife importante,No,FALSE,TRUE,Salada,TRUE
+                7,Huachinango,Lutjanus campechanus,K'aan xook,Pez demersal comercial,No,FALSE,FALSE,Salada,FALSE
                 """;
 
             // Act
@@ -59,12 +59,14 @@ class CsvParserServiceTest {
             EspecieCsvRow mero = result.get(0);
             assertEquals(5, mero.id());
             assertEquals("Mero", mero.nombreComun());
-            assertEquals("Epinephelus morio", mero.especieCientifica());
+            assertEquals("Epinephelus morio", mero.nombreCientifico());
             assertEquals("Xlavita", mero.nombreMaya());
-            assertEquals("40 cm", mero.tallaMinima());
-            assertEquals("Arrecifes", mero.habitat());
-            assertEquals("Curricán", mero.tecnicaRecomendada());
-            assertEquals("Golfo de México", mero.zona());
+            assertEquals("Pez de arrecife importante", mero.descripcion());
+            assertEquals("No", mero.riesgoCiguatera());
+            assertEquals(false, mero.esInvasiva());
+            assertEquals(true, mero.esProtegida());
+            assertEquals("Salada", mero.tipoAgua());
+            assertEquals(true, mero.migratorio());
 
             // Segunda especie
             EspecieCsvRow huachinango = result.get(1);
@@ -77,8 +79,8 @@ class CsvParserServiceTest {
         void testParseEspecies_ConComillas() {
             // Arrange
             String csv = """
-                ID,NOMBRE COMÚN,ESPECIE,NOMBRE MAYA,TALLA MÍNIMA,HÁBITAT,TÉCNICA RECOMENDADA,ZONA
-                5,Mero,"Epinephelus morio, variante roja",Xlavita,40 cm,"Arrecifes, fondos rocosos",Curricán,"Golfo de México, Zona Norte"
+                ID,NOMBRE COMÚN,NOMBRE CIENTÍFICO,NOMBRE MAYA,DESCRIPCIÓN,RIESGO CIGUATERA,ES INVASIVA,ES PROTEGIDA,TIPO AGUA,MIGRATORIO
+                5,Mero,"Epinephelus morio, variante roja",Xlavita,"Pez de arrecife, muy apreciado",No,FALSE,FALSE,"Salada, con influencia dulce",FALSE
                 """;
 
             // Act
@@ -86,9 +88,9 @@ class CsvParserServiceTest {
 
             // Assert
             assertEquals(1, result.size());
-            assertEquals("Epinephelus morio, variante roja", result.get(0).especieCientifica());
-            assertEquals("Arrecifes, fondos rocosos", result.get(0).habitat());
-            assertEquals("Golfo de México, Zona Norte", result.get(0).zona());
+            assertEquals("Epinephelus morio, variante roja", result.get(0).nombreCientifico());
+            assertEquals("Pez de arrecife, muy apreciado", result.get(0).descripcion());
+            assertEquals("Salada, con influencia dulce", result.get(0).tipoAgua());
         }
 
         @Test
@@ -96,8 +98,8 @@ class CsvParserServiceTest {
         void testParseEspecies_CamposVacios() {
             // Arrange
             String csv = """
-                ID,NOMBRE COMÚN,ESPECIE,NOMBRE MAYA,TALLA MÍNIMA,HÁBITAT,TÉCNICA RECOMENDADA,ZONA
-                5,Mero,Epinephelus morio,,40 cm,Arrecifes,,Golfo
+                ID,NOMBRE COMÚN,NOMBRE CIENTÍFICO,NOMBRE MAYA,DESCRIPCIÓN,RIESGO CIGUATERA,ES INVASIVA,ES PROTEGIDA,TIPO AGUA,MIGRATORIO
+                5,Mero,Epinephelus morio,,,No,,FALSE,,TRUE
                 """;
 
             // Act
@@ -106,7 +108,7 @@ class CsvParserServiceTest {
             // Assert
             assertEquals(1, result.size());
             assertEquals("", result.get(0).nombreMaya()); // Campo vacío = string vacío
-            assertEquals("", result.get(0).tecnicaRecomendada());
+            assertEquals("", result.get(0).descripcion());
         }
 
         @Test
@@ -114,10 +116,10 @@ class CsvParserServiceTest {
         void testParseEspecies_FilaIncompleta() {
             // Arrange
             String csv = """
-                ID,NOMBRE COMÚN,ESPECIE,NOMBRE MAYA,TALLA MÍNIMA,HÁBITAT,TÉCNICA RECOMENDADA,ZONA
-                5,Mero,Epinephelus morio,Xlavita,40 cm,Arrecifes,Curricán,Golfo
+                ID,NOMBRE COMÚN,NOMBRE CIENTÍFICO,NOMBRE MAYA,DESCRIPCIÓN,RIESGO CIGUATERA,ES INVASIVA,ES PROTEGIDA,TIPO AGUA,MIGRATORIO
+                5,Mero,Epinephelus morio,Xlavita,Pez importante,No,FALSE,FALSE,Salada,TRUE
                 7,Robalo
-                9,Huachinango,Lutjanus campechanus,K'aan xook,25 cm,Rocosos,Línea,Caribe
+                9,Huachinango,Lutjanus campechanus,K'aan xook,Pez comercial,No,FALSE,FALSE,Salada,FALSE
                 """;
 
             // Act
@@ -133,7 +135,7 @@ class CsvParserServiceTest {
         @DisplayName("Debe retornar lista vacía si CSV solo tiene header")
         void testParseEspecies_SoloHeader() {
             // Arrange
-            String csv = "ID,NOMBRE COMÚN,ESPECIE,NOMBRE MAYA,TALLA MÍNIMA,HÁBITAT,TÉCNICA RECOMENDADA,ZONA\n";
+            String csv = "ID,NOMBRE COMÚN,NOMBRE CIENTÍFICO,NOMBRE MAYA,DESCRIPCIÓN,RIESGO CIGUATERA,ES INVASIVA,ES PROTEGIDA,TIPO AGUA,MIGRATORIO\n";
 
             // Act
             List<EspecieCsvRow> result = parser.parsePeces(csv.getBytes(StandardCharsets.UTF_8));
@@ -149,13 +151,16 @@ class CsvParserServiceTest {
             byte[] csvWithBom = new byte[] {
                     (byte) 0xEF, (byte) 0xBB, (byte) 0xBF, // BOM
                     'I', 'D', ',', 'N', 'O', 'M', 'B', 'R', 'E', ' ', 'C', 'O', 'M', 'N', ',',
-                    'E', 'S', 'P', 'E', 'C', 'I', 'E', ',', 'N', 'O', 'M', 'B', 'R', 'E', ' ', 'M', 'A', 'Y', 'A', ',',
-                    'T', 'A', 'L', 'L', 'A', ' ', 'M', 'N', 'I', 'M', 'A', ',',
-                    'H',  'B', 'I', 'T', 'A', 'T', ',',
-                    'T', 'C', 'N', 'I', 'C', 'A', ' ', 'R', 'E', 'C', 'O', 'M', 'E', 'N', 'D', 'A', 'D', 'A', ',',
-                    'Z', 'O', 'N', 'A', '\n',
+                    'N', 'O', 'M', 'B', 'R', 'E', ' ', 'C', 'I', 'E', 'N', 'T', 'I', 'F', 'I', 'C', 'O', ',',
+                    'N', 'O', 'M', 'B', 'R', 'E', ' ', 'M', 'A', 'Y', 'A', ',',
+                    'D', 'E', 'S', 'C', 'R', 'I', 'P', 'C', 'I', 'O', 'N', ',',
+                    'R', 'I', 'E', 'S', 'G', 'O', ' ', 'C', 'I', 'G', 'U', 'A', ',',
+                    'E', 'S', ' ', 'I', 'N', 'V', 'A', 'S', 'I', 'V', 'A', ',',
+                    'E', 'S', ' ', 'P', 'R', 'O', 'T', 'E', 'G', 'I', 'D', 'A', ',',
+                    'T', 'I', 'P', 'O', ' ', 'A', 'G', 'U', 'A', ',',
+                    'M', 'I', 'G', 'R', 'A', 'T', 'O', 'R', 'I', 'O', '\n',
                     '5', ',', 'M', 'e', 'r', 'o', ',', 'E', 'p', 'i', 'n', 'e', 'p', 'h', 'e', 'l', 'u', 's', ',',
-                    ',', ',', ',', ',', '\n'
+                    ',', ',', ',', ',', ',', ',', ',', ',', '\n'
             };
 
             // Act
@@ -359,9 +364,9 @@ class CsvParserServiceTest {
         @DisplayName("Debe manejar diferentes tipos de saltos de línea")
         void testParse_SaltosDeLinea() {
             // Arrange - Mezcla de \n y \r\n
-            String csv = "ID,NOMBRE COMÚN,ESPECIE,NOMBRE MAYA,TALLA MÍNIMA,HÁBITAT,TÉCNICA RECOMENDADA,ZONA\r\n" +
-                    "5,Mero,Epinephelus morio,Xlavita,40 cm,Arrecifes,Curricán,Golfo\n" +
-                    "7,Huachinango,Lutjanus campechanus,K'aan xook,25 cm,Rocosos,Línea,Caribe\r\n";
+            String csv = "ID,NOMBRE COMÚN,NOMBRE CIENTÍFICO,NOMBRE MAYA,DESCRIPCIÓN,RIESGO CIGUATERA,ES INVASIVA,ES PROTEGIDA,TIPO AGUA,MIGRATORIO\r\n" +
+                    "5,Mero,Epinephelus morio,Xlavita,Pez importante,No,FALSE,FALSE,Salada,TRUE\n" +
+                    "7,Huachinango,Lutjanus campechanus,K'aan xook,Pez comercial,No,FALSE,FALSE,Salada,FALSE\r\n";
 
             // Act
             List<EspecieCsvRow> result = parser.parsePeces(csv.getBytes(StandardCharsets.UTF_8));

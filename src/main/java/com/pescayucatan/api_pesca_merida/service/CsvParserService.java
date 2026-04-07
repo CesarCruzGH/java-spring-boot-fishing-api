@@ -1,7 +1,10 @@
 package com.pescayucatan.api_pesca_merida.service;
 
+import com.pescayucatan.api_pesca_merida.infrastructure.csv.ArtePescaCsvRow;
 import com.pescayucatan.api_pesca_merida.infrastructure.csv.EspecieCsvRow;
-import com.pescayucatan.api_pesca_merida.infrastructure.csv.VedaCsvRow;
+import com.pescayucatan.api_pesca_merida.infrastructure.csv.ZonaCsvRow;
+import com.pescayucatan.api_pesca_merida.infrastructure.csv.RegulacionCsvRow;
+import com.pescayucatan.api_pesca_merida.infrastructure.csv.PeriodoVedaCsvRow;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -88,68 +91,194 @@ public class CsvParserService {
     }
 
     /**
-     * Parsea CSV de VEDAS (Hoja 2 del Google Sheet).
+     * Parsea CSV de ZONAS (del documento guía).
      *
-     * Formato esperado (12 columnas):
-     * Pez ID | Nombre Común | Especie | Zona | Tipo Veda | Inicio mes | Inicio día |
-     * Fin mes | Fin día | Inicio fijo | Fin fijo | Fuente DOF
+     * Formato esperado (8 columnas):
+     * ID | Nombre | Macro Zona | Tipo Restricción | Categoría Hídrica | Es ANP | Municipio Sede | Notas Específicas
      *
-     * @param csvBytes Contenido crudo del CSV descargado desde Google Sheets
-     * @return Lista de DTOs de vedas, excluyendo filas inválidas
+     * @param csvBytes Contenido crudo del CSV
+     * @return Lista de DTOs de zonas, excluyendo filas inválidas
      */
-    public List<VedaCsvRow> parseVedas(byte[] csvBytes) {
+    public List<ZonaCsvRow> parseZonas(byte[] csvBytes) {
         String csvContent = stripUtf8Bom(csvBytes);
-        List<VedaCsvRow> rows = new ArrayList<>();
+        List<ZonaCsvRow> rows = new ArrayList<>();
         String[] lines = csvContent.split("\r?\n");
 
         if (lines.length <= 1) {
-            log.warn("CSV de vedas vacío o solo contiene header");
+            log.warn("CSV de zonas vacío o solo contiene header");
             return rows;
         }
 
-        // Validar header
-        validateVedasHeader(lines[0]);
+        validateZonasHeader(lines[0]);
 
-        // Parsear filas de datos (skip header)
         for (int i = 1; i < lines.length; i++) {
             try {
                 String[] cols = parseCsvLine(lines[i]);
 
-                // Validación: Mínimo 12 columnas
-                if (cols.length < 12) {
-                    log.warn("Fila {} de vedas incompleta ({} cols): {}",
+                if (cols.length < 8) {
+                    log.warn("Fila {} de zonas incompleta ({} cols): {}",
                             i + 1, cols.length, lines[i]);
                     continue;
                 }
 
-                // Validación adicional: Pez ID debe existir
-                Integer pezId = parseIntOrNull(cols[0]);
-                if (pezId == null) {
-                    log.warn("Fila {} de vedas sin Pez ID válido, skipping", i + 1);
+                Long zonaId = parseLongOrNull(cols[0]);
+                if (zonaId == null) {
+                    log.warn("Fila {} de zonas sin ID válido, skipping", i + 1);
                     continue;
                 }
 
-                rows.add(new VedaCsvRow(
-                        pezId,                     // Pez ID (FK)
-                        cols[1].trim(),            // Nombre Común
-                        cols[2].trim(),            // Especie Científica
-                        cols[3].trim(),            // Zona
-                        cols[4].trim(),            // Tipo de Veda
-                        parseIntOrNull(cols[5]),   // Inicio mes
-                        parseIntOrNull(cols[6]),   // Inicio día
-                        parseIntOrNull(cols[7]),   // Fin mes
-                        parseIntOrNull(cols[8]),   // Fin día
-                        cols[9].trim(),            // Inicio fijo
-                        cols[10].trim(),           // Fin fijo
-                        cols[11].trim()            // Fuente DOF
+                rows.add(new ZonaCsvRow(
+                        zonaId,
+                        cols[1].trim(),
+                        cols[2].trim(),
+                        cols[3].trim(),
+                        cols[4].trim(),
+                        parseBoolOrNull(cols[5]),
+                        cols[6].trim(),
+                        cols[7].trim()
                 ));
 
             } catch (Exception e) {
-                log.error("Error parseando fila {} de vedas: {}", i + 1, e.getMessage());
+                log.error("Error parseando fila {} de zonas: {}", i + 1, e.getMessage());
             }
         }
 
-        log.info("✅ Parseadas {} vedas de {} filas totales", rows.size(), lines.length - 1);
+        log.info("✅ Parseadas {} zonas de {} filas totales", rows.size(), lines.length - 1);
+        return rows;
+    }
+
+    /**
+     * Parsea CSV de REGULACIONES.
+     *
+     * Formato esperado (9 columnas):
+     * ID | Pez ID | Zona ID | Categoría Pesca | Talla Mínima | Talla Máxima | Tipo Medición | Cuota Diaria | Requiere Permiso
+     *
+     * @param csvBytes Contenido crudo del CSV
+     * @return Lista de DTOs de regulaciones, excluyendo filas inválidas
+     */
+    public List<RegulacionCsvRow> parseRegulaciones(byte[] csvBytes) {
+        String csvContent = stripUtf8Bom(csvBytes);
+        List<RegulacionCsvRow> rows = new ArrayList<>();
+        String[] lines = csvContent.split("\r?\n");
+
+        if (lines.length <= 1) {
+            log.warn("CSV de regulaciones vacío o solo contiene header");
+            return rows;
+        }
+
+        validateRegulacionesHeader(lines[0]);
+
+        for (int i = 1; i < lines.length; i++) {
+            try {
+                String[] cols = parseCsvLine(lines[i]);
+
+                if (cols.length < 9) {
+                    log.warn("Fila {} de regulaciones incompleta ({} cols): {}",
+                            i + 1, cols.length, lines[i]);
+                    continue;
+                }
+
+                Long regulacionId = parseLongOrNull(cols[0]);
+                if (regulacionId == null) {
+                    log.warn("Fila {} de regulaciones sin ID válido, skipping", i + 1);
+                    continue;
+                }
+
+                rows.add(RegulacionCsvRow.fromCsvLine(cols));
+
+            } catch (Exception e) {
+                log.error("Error parseando fila {} de regulaciones: {}", i + 1, e.getMessage());
+            }
+        }
+
+        log.info("✅ Parseadas {} regulaciones de {} filas totales", rows.size(), lines.length - 1);
+        return rows;
+    }
+
+    /**
+     * Parsea CSV de PERIODOS DE VEDA.
+     *
+     * Formato esperado (8 columnas):
+     * ID | Regulacion ID | Tipo Veda | Mes Inicio | Día Inicio | Mes Fin | Día Fin | Fuente DOF
+     *
+     * @param csvBytes Contenido crudo del CSV
+     * @return Lista de DTOs de periodo veda, excluyendo filas inválidas
+     */
+    public List<PeriodoVedaCsvRow> parsePeriodoVedas(byte[] csvBytes) {
+        String csvContent = stripUtf8Bom(csvBytes);
+        List<PeriodoVedaCsvRow> rows = new ArrayList<>();
+        String[] lines = csvContent.split("\r?\n");
+
+        if (lines.length <= 1) {
+            log.warn("CSV de periodo veda vacío o solo contiene header");
+            return rows;
+        }
+
+        validatePeriodoVedasHeader(lines[0]);
+
+        for (int i = 1; i < lines.length; i++) {
+            try {
+                String[] cols = parseCsvLine(lines[i]);
+
+                if (cols.length < 8) {
+                    log.warn("Fila {} de periodo veda incompleta ({} cols): {}",
+                            i + 1, cols.length, lines[i]);
+                    continue;
+                }
+
+                Long periodoId = parseLongOrNull(cols[0]);
+                if (periodoId == null) {
+                    log.warn("Fila {} de periodo veda sin ID válido, skipping", i + 1);
+                    continue;
+                }
+
+                rows.add(PeriodoVedaCsvRow.fromCsvLine(cols));
+
+            } catch (Exception e) {
+                log.error("Error parseando fila {} de periodo veda: {}", i + 1, e.getMessage());
+            }
+        }
+
+        log.info("✅ Parseados {} periodos veda de {} filas totales", rows.size(), lines.length - 1);
+        return rows;
+    }
+
+    public List<ArtePescaCsvRow> parseArtePesca(byte[] csvBytes) {
+        String csvContent = stripUtf8Bom(csvBytes);
+        List<ArtePescaCsvRow> rows = new ArrayList<>();
+        String[] lines = csvContent.split("\r?\n");
+
+        if (lines.length <= 1) {
+            log.warn("CSV de arte pesca vacío o solo contiene header");
+            return rows;
+        }
+
+        validateArtePescaHeader(lines[0]);
+
+        for (int i = 1; i < lines.length; i++) {
+            try {
+                String[] cols = parseCsvLine(lines[i]);
+
+                if (cols.length < 4) {
+                    log.warn("Fila {} de arte pesca incompleta ({} cols): {}",
+                            i + 1, cols.length, lines[i]);
+                    continue;
+                }
+
+                Long artePescaId = parseLongOrNull(cols[0]);
+                if (artePescaId == null) {
+                    log.warn("Fila {} de arte pesca sin ID válido, skipping", i + 1);
+                    continue;
+                }
+
+                rows.add(ArtePescaCsvRow.fromCsvLine(cols));
+
+            } catch (Exception e) {
+                log.error("Error parseando fila {} de arte pesca: {}", i + 1, e.getMessage());
+            }
+        }
+
+        log.info("✅ Parseados {} artes pesca de {} filas totales", rows.size(), lines.length - 1);
         return rows;
     }
 
@@ -192,27 +321,6 @@ public class CsvParserService {
         }
 
         log.debug("Header especies: {}", String.join(" | ", actualCols));
-    }
-
-    /**
-     * Valida que el header del CSV de vedas contenga las columnas esperadas.
-     */
-    private void validateVedasHeader(String headerLine) {
-        String[] expectedCols = {
-                "Pez ID", "Nombre Común", "Especie Científica", "Zona", "Tipo de Veda",
-                "Inicio mes", "Inicio día", "Fin mes", "Fin día",
-                "Inicio fijo", "Fin fijo", "Fuente DOF"
-        };
-
-        String[] actualCols = parseCsvLine(headerLine);
-
-        if (actualCols.length < expectedCols.length) {
-            log.warn("⚠️ Header de vedas tiene {} columnas, se esperaban {}. " +
-                            "Posible cambio de schema en Google Sheet.",
-                    actualCols.length, expectedCols.length);
-        }
-
-        log.debug("Header vedas: {}", String.join(" | ", actualCols));
     }
 
     /**
@@ -274,5 +382,94 @@ public class CsvParserService {
             log.debug("Valor no numérico encontrado: '{}', retornando null", val);
             return null;
         }
+    }
+
+    private Long parseLongOrNull(String val) {
+        if (val == null || val.isBlank()) {
+            return null;
+        }
+        try {
+            return Long.parseLong(val.trim());
+        } catch (NumberFormatException e) {
+            log.debug("Valor no numérico (Long) encontrado: '{}', retornando null", val);
+            return null;
+        }
+    }
+
+    private Boolean parseBoolOrNull(String s) {
+        if (s == null || s.isBlank()) return null;
+        return switch (s.trim().toUpperCase()) {
+            case "TRUE", "1", "SI", "S" -> true;
+            case "FALSE", "0", "NO", "N" -> false;
+            default -> null;
+        };
+    }
+
+    private void validateZonasHeader(String headerLine) {
+        String[] expectedCols = {
+                "ID", "NOMBRE", "MACROO ZONA", "TIPO RESTRICCION",
+                "CATEGORIA HIDRICA", "ES ANP", "MUNICIPIO SEDE", "NOTAS ESPECIFICAS"
+        };
+
+        String[] actualCols = parseCsvLine(headerLine);
+
+        if (actualCols.length < expectedCols.length) {
+            log.warn("⚠️ Header de zonas tiene {} columnas, se esperaban {}. " +
+                            "Posible cambio de schema.",
+                    actualCols.length, expectedCols.length);
+        }
+
+        log.debug("Header zonas: {}", String.join(" | ", actualCols));
+    }
+
+    private void validateRegulacionesHeader(String headerLine) {
+        String[] expectedCols = {
+                "ID", "Pez ID", "Zona ID", "Categoría Pesca",
+                "Talla Mínima", "Talla Máxima", "Tipo Medición",
+                "Cuota Diaria", "Requiere Permiso"
+        };
+
+        String[] actualCols = parseCsvLine(headerLine);
+
+        if (actualCols.length < expectedCols.length) {
+            log.warn("⚠️ Header de regulaciones tiene {} columnas, se esperaban {}. " +
+                            "Posible cambio de schema.",
+                    actualCols.length, expectedCols.length);
+        }
+
+        log.debug("Header regulaciones: {}", String.join(" | ", actualCols));
+    }
+
+    private void validatePeriodoVedasHeader(String headerLine) {
+        String[] expectedCols = {
+                "ID", "Regulación ID", "Tipo Veda", "Mes Inicio", "Día Inicio",
+                "Mes Fin", "Día Fin", "Fuente DOF"
+        };
+
+        String[] actualCols = parseCsvLine(headerLine);
+
+        if (actualCols.length < expectedCols.length) {
+            log.warn("⚠️ Header de periodo veda tiene {} columnas, se esperaban {}. " +
+                            "Posible cambio de schema.",
+                    actualCols.length, expectedCols.length);
+        }
+
+        log.debug("Header periodo veda: {}", String.join(" | ", actualCols));
+    }
+
+    private void validateArtePescaHeader(String headerLine) {
+        String[] expectedCols = {
+                "ID", "Regulación ID", "Nombre", "Es Prohibido"
+        };
+
+        String[] actualCols = parseCsvLine(headerLine);
+
+        if (actualCols.length < expectedCols.length) {
+            log.warn("⚠️ Header de arte pesca tiene {} columnas, se esperaban {}. " +
+                            "Posible cambio de schema.",
+                    actualCols.length, expectedCols.length);
+        }
+
+        log.debug("Header arte pesca: {}", String.join(" | ", actualCols));
     }
 }

@@ -1,8 +1,8 @@
 package com.pescayucatan.api_pesca_merida.enums;
 
 public enum TipoVeda {
-    TEMPORAL_FIJA,       // Fechas cíclicas anuales fijas
-    TEMPORAL_VARIABLE,   // Fechas cíclicas que cambian por DOF
+    FIJA,       // Fechas cíclicas anuales fijas
+    VARIABLE,   // Fechas cíclicas que cambian por DOF
     PERMANENTE,          // Sin fechas, prohibición total
     PLURIANUAL;          // Abarca múltiples años
 
@@ -13,8 +13,8 @@ public enum TipoVeda {
     public static TipoVeda fromCsvValue(String raw) {
         if (raw == null) throw new IllegalArgumentException("TipoVeda null");
         return switch (raw.trim().toUpperCase()) {
-            case "TEMPORAL FIJA"     -> TEMPORAL_FIJA;
-            case "TEMPORAL VARIABLE" -> TEMPORAL_VARIABLE;
+            case "TEMPORAL FIJA"     -> FIJA;
+            case "TEMPORAL VARIABLE" -> VARIABLE;
             case "PERMANENTE"        -> PERMANENTE;
             case "PLURIANUAL"        -> PLURIANUAL;
             default -> throw new IllegalArgumentException(

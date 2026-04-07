@@ -1,15 +1,29 @@
 package com.pescayucatan.api_pesca_merida.service;
 
+import com.pescayucatan.api_pesca_merida.infrastructure.csv.ArtePescaCsvRow;
 import com.pescayucatan.api_pesca_merida.infrastructure.csv.EspecieCsvRow;
-import com.pescayucatan.api_pesca_merida.infrastructure.csv.VedaCsvRow;
-import com.pescayucatan.api_pesca_merida.model.EspecieVeda;
+import com.pescayucatan.api_pesca_merida.infrastructure.csv.ZonaCsvRow;
+import com.pescayucatan.api_pesca_merida.infrastructure.csv.RegulacionCsvRow;
+import com.pescayucatan.api_pesca_merida.infrastructure.csv.PeriodoVedaCsvRow;
+import com.pescayucatan.api_pesca_merida.model.ArtePesca;
 import com.pescayucatan.api_pesca_merida.model.IngestionLog;
 import com.pescayucatan.api_pesca_merida.model.Pez;
+import com.pescayucatan.api_pesca_merida.model.Zona;
+import com.pescayucatan.api_pesca_merida.model.Regulacion;
+import com.pescayucatan.api_pesca_merida.model.PeriodoVeda;
 import com.pescayucatan.api_pesca_merida.enums.TipoVeda;
 import com.pescayucatan.api_pesca_merida.enums.EstadoIngestion;
-import com.pescayucatan.api_pesca_merida.repository.EspecieVedaRepository;
+import com.pescayucatan.api_pesca_merida.enums.CategoriaHidrica;
+import com.pescayucatan.api_pesca_merida.enums.MacroZona;
+import com.pescayucatan.api_pesca_merida.enums.TipoRestriccion;
+import com.pescayucatan.api_pesca_merida.enums.CategoriaPesca;
+import com.pescayucatan.api_pesca_merida.enums.TipoMedicion;
+import com.pescayucatan.api_pesca_merida.repository.ArtePescaRepository;
 import com.pescayucatan.api_pesca_merida.repository.IngestionLogRepository;
 import com.pescayucatan.api_pesca_merida.repository.PezRepository;
+import com.pescayucatan.api_pesca_merida.repository.ZonaRepository;
+import com.pescayucatan.api_pesca_merida.repository.RegulacionRepository;
+import com.pescayucatan.api_pesca_merida.repository.PeriodoVedaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -68,8 +82,11 @@ public class IngestionService {
 
     private final CsvParserService csvParser;
     private final PezRepository pezRepository;
-    private final EspecieVedaRepository especieVedaRepository;
     private final IngestionLogRepository ingestionLogRepository;
+    private final ZonaRepository zonaRepository;
+    private final RegulacionRepository regulacionRepository;
+    private final PeriodoVedaRepository periodoVedaRepository;
+    private final ArtePescaRepository artePescaRepository;
 
     // Cliente HTTP reutilizable (thread-safe)
     private final HttpClient httpClient = HttpClient.newBuilder()
@@ -84,8 +101,17 @@ public class IngestionService {
     @Value("${ingestion.sheets.especies-url}")
     private String especiesUrl;
 
-    @Value("${ingestion.sheets.vedas-url}")
-    private String vedasUrl;
+    @Value("${ingestion.sheets.zonas-url}")
+    private String zonasUrl;
+
+    @Value("${ingestion.sheets.regulaciones-url}")
+    private String regulacionesUrl;
+
+    @Value("${ingestion.sheets.periodo-vedas-url}")
+    private String periodoVedasUrl;
+
+    @Value("${ingestion.sheets.arte-pesca-url}")
+    private String artePescaUrl;
 
     // ============================================================================
     // MÉTODO PRINCIPAL (ORQUESTADOR)
@@ -114,12 +140,24 @@ public class IngestionService {
 
         try {
             // Fase 1: Ingerir especies
-            log.info("📥 Fase 1/2: Procesando CSV de Especies...");
+            log.info("📥 Fase 1/5: Procesando CSV de Especies...");
             IngestionLog especiesLog = procesarEspecies();
 
-            // Fase 2: Ingerir vedas
-            log.info("📥 Fase 2/2: Procesando CSV de Vedas...");
-            IngestionLog vedasLog = procesarVedas();
+            // Fase 2: Ingerir zonas
+            log.info("📥 Fase 2/5: Procesando CSV de Zonas...");
+            IngestionLog zonasLog = procesarZonas();
+
+            // Fase 3: Ingerir regulaciones
+            log.info("📥 Fase 3/5: Procesando CSV de Regulaciones...");
+            IngestionLog regulacionesLog = procesarRegulaciones();
+
+            // Fase 4: Ingerir periodo vedas
+            log.info("📥 Fase 4/5: Procesando CSV de Periodo Vedas...");
+            IngestionLog periodoVedasLog = procesarPeriodoVedas();
+
+            // Fase 5: Ingerir artes pesca
+            log.info("📥 Fase 5/5: Procesando CSV de Artes Pesca...");
+            IngestionLog artePescaLog = procesarArtePesca();
 
             // Resumen final
             LocalDateTime fin = LocalDateTime.now();
@@ -130,8 +168,14 @@ public class IngestionService {
             log.info("╠════════════════════════════════════════════════════════════════╣");
             log.info("║  Especies: {} filas procesadas                                ",
                     especiesLog != null ? especiesLog.getTotalFilas() : 0);
-            log.info("║  Vedas:    {} filas procesadas                                ",
-                    vedasLog != null ? vedasLog.getTotalFilas() : 0);
+            log.info("║  Zonas:    {} filas procesadas                                ",
+                    zonasLog != null ? zonasLog.getTotalFilas() : 0);
+            log.info("║  Regulaciones: {} filas procesadas                          ",
+                    regulacionesLog != null ? regulacionesLog.getTotalFilas() : 0);
+            log.info("║  Periodo Vedas: {} filas procesadas                        ",
+                    periodoVedasLog != null ? periodoVedasLog.getTotalFilas() : 0);
+            log.info("║  Artes Pesca: {} filas procesadas                           ",
+                    artePescaLog != null ? artePescaLog.getTotalFilas() : 0);
             log.info("║  Duración: {} segundos                                        ",
                     duracion.getSeconds());
             log.info("╚════════════════════════════════════════════════════════════════╝");
@@ -196,50 +240,125 @@ public class IngestionService {
     }
 
     // ============================================================================
-    // PROCESAMIENTO DE VEDAS
+    // PROCESAMIENTO DE ZONAS
     // ============================================================================
 
     /**
-     * Descarga, valida y procesa el CSV de vedas.
+     * Descarga, valida y procesa el CSV de zonas.
      *
      * @return IngestionLog con resultado del procesamiento, o null si se saltó
      */
-    private IngestionLog procesarVedas() {
+    private IngestionLog procesarZonas() {
         try {
-            // 1. Descargar CSV
-            log.debug("Descargando CSV de vedas desde: {}", vedasUrl);
-            byte[] csvBytes = descargarCsv(vedasUrl);
+            log.debug("Descargando CSV de zonas desde: {}", zonasUrl);
+            byte[] csvBytes = descargarCsv(zonasUrl);
 
-            // 2. Calcular hash
             String hash = calcularSha256(csvBytes);
             log.debug("Hash SHA-256 calculado: {}", hash);
 
-            // 3. Verificar si ya fue procesado
             if (ingestionLogRepository.existsByHashSha256(hash)) {
-                log.info("⏭️  CSV de vedas sin cambios (hash: {}...), SKIP",
+                log.info("⏭️  CSV de zonas sin cambios (hash: {}...), SKIP",
                         hash.substring(0, 8));
                 return null;
             }
 
-            // 4. Parsear CSV
-            List<VedaCsvRow> vedas = csvParser.parseVedas(csvBytes);
-            log.info("✅ Parseadas {} vedas", vedas.size());
+            List<ZonaCsvRow> zonas = csvParser.parseZonas(csvBytes);
+            log.info("✅ Parseadas {} zonas", zonas.size());
 
-            // 5. Crear registro (Cambiamos el nombre de la variable a 'registro')
-            IngestionLog registro = crearIngestionLog("vedas.csv", hash,
-                    vedas.size(), EstadoIngestion.PROCESANDO);
+            IngestionLog registro = crearIngestionLog("zonas.csv", hash,
+                    zonas.size(), EstadoIngestion.PROCESANDO);
 
-            // 6. UPSERT en base de datos
-            int actualizadas = upsertVedas(vedas);
-            log.info("💾 {} vedas actualizadas/insertadas en BD", actualizadas);
+            int actualizadas = upsertZonas(zonas);
+            log.info("💾 {} zonas actualizadas/insertadas en BD", actualizadas);
 
-            // 7. Actualizar log a COMPLETADO
             registro.setEstado(EstadoIngestion.COMPLETADO);
             return ingestionLogRepository.save(registro);
 
         } catch (Exception e) {
-            log.error("❌ Error procesando vedas: {}", e.getMessage(), e);
-            throw new RuntimeException("Fallo en procesamiento de vedas", e);
+            log.error("❌ Error procesando zonas: {}", e.getMessage(), e);
+            throw new RuntimeException("Fallo en procesamiento de zonas", e);
+        }
+    }
+
+    // ============================================================================
+    // PROCESAMIENTO DE REGULACIONES
+    // ============================================================================
+
+    /**
+     * Descarga, valida y procesa el CSV de regulaciones.
+     *
+     * @return IngestionLog con resultado del procesamiento, o null si se saltó
+     */
+    private IngestionLog procesarRegulaciones() {
+        try {
+            log.debug("Descargando CSV de regulaciones desde: {}", regulacionesUrl);
+            byte[] csvBytes = descargarCsv(regulacionesUrl);
+
+            String hash = calcularSha256(csvBytes);
+            log.debug("Hash SHA-256 calculado: {}", hash);
+
+            if (ingestionLogRepository.existsByHashSha256(hash)) {
+                log.info("⏭️  CSV de regulaciones sin cambios (hash: {}...), SKIP",
+                        hash.substring(0, 8));
+                return null;
+            }
+
+            List<RegulacionCsvRow> regulaciones = csvParser.parseRegulaciones(csvBytes);
+            log.info("✅ Parseadas {} regulaciones", regulaciones.size());
+
+            IngestionLog registro = crearIngestionLog("regulaciones.csv", hash,
+                    regulaciones.size(), EstadoIngestion.PROCESANDO);
+
+            int actualizadas = upsertRegulaciones(regulaciones);
+            log.info("💾 {} regulaciones actualizadas/insertadas en BD", actualizadas);
+
+            registro.setEstado(EstadoIngestion.COMPLETADO);
+            return ingestionLogRepository.save(registro);
+
+        } catch (Exception e) {
+            log.error("❌ Error procesando regulaciones: {}", e.getMessage(), e);
+            throw new RuntimeException("Fallo en procesamiento de regulaciones", e);
+        }
+    }
+
+    // ============================================================================
+    // PROCESAMIENTO DE PERIODO VEDAS
+    // ============================================================================
+
+    /**
+     * Descarga, valida y procesa el CSV de periodo vedas.
+     *
+     * @return IngestionLog con resultado del procesamiento, o null si se saltó
+     */
+    private IngestionLog procesarPeriodoVedas() {
+        try {
+            log.debug("Descargando CSV de periodo vedas desde: {}", periodoVedasUrl);
+            byte[] csvBytes = descargarCsv(periodoVedasUrl);
+
+            String hash = calcularSha256(csvBytes);
+            log.debug("Hash SHA-256 calculado: {}", hash);
+
+            if (ingestionLogRepository.existsByHashSha256(hash)) {
+                log.info("⏭️  CSV de periodo vedas sin cambios (hash: {}...), SKIP",
+                        hash.substring(0, 8));
+                return null;
+            }
+
+            List<PeriodoVedaCsvRow> periodoVedas = csvParser.parsePeriodoVedas(csvBytes);
+            log.info("✅ Parseados {} periodo vedas", periodoVedas.size());
+
+            IngestionLog registro = crearIngestionLog("periodo_vedas.csv", hash,
+                    periodoVedas.size(), EstadoIngestion.PROCESANDO);
+
+            int actualizadas = upsertPeriodoVedas(periodoVedas);
+            log.info("💾 {} periodo vedas actualizadas/insertadas en BD", actualizadas);
+
+            registro.setEstado(EstadoIngestion.COMPLETADO);
+            return ingestionLogRepository.save(registro);
+
+        } catch (Exception e) {
+            log.error("❌ Error procesando periodo vedas: {}", e.getMessage(), e);
+            throw new RuntimeException("Fallo en procesamiento de periodo vedas", e);
         }
     }
 
@@ -295,72 +414,216 @@ public class IngestionService {
     }
 
     // ============================================================================
-    // UPSERT DE VEDAS
+    // UPSERT DE ZONAS
     // ============================================================================
 
     /**
-     * Inserta o actualiza vedas en la base de datos.
+     * Inserta o actualiza zonas en la base de datos.
      *
-     * ESTRATEGIA:
-     * - Buscar Pez por codigo_conapesca (FK)
-     * - Si Pez no existe → SKIP veda (log warning)
-     * - Buscar veda por (pez_id, zona, tipo_veda) combinación única
-     * - Si existe → UPDATE
-     * - Si no existe → INSERT
-     *
-     * @param vedas Lista de DTOs parseados del CSV
+     * @param zonas Lista de DTOs parseados del CSV
      * @return Cantidad de registros afectados
      */
     @Transactional
-    protected int upsertVedas(List<VedaCsvRow> vedas) {
+    protected int upsertZonas(List<ZonaCsvRow> zonas) {
         int contador = 0;
 
-        for (VedaCsvRow dto : vedas) {
+        for (ZonaCsvRow dto : zonas) {
             try {
-                // 1. Buscar Pez (FK requerida)
-                Pez pez = pezRepository.findById(Long.valueOf(dto.pezId()))
-                        .orElse(null);
+                Zona zona = zonaRepository.findById(dto.id())
+                        .orElse(new Zona());
 
-                if (pez == null) {
-                    log.warn("⚠️  Pez ID {} no encontrado, skipping veda en zona {}",
-                            dto.pezId(), dto.zona());
-                    continue;
-                }
+                zona.setId(dto.id());
+                zona.setNombre(dto.nombre());
+                zona.setMacroZona(MacroZona.valueOf(dto.macroZona().toUpperCase().trim()));
+                zona.setTipoRestriccion(TipoRestriccion.valueOf(dto.tipoRestriccion().toUpperCase().trim()));
+                zona.setCategoriaHidrica(CategoriaHidrica.valueOf(dto.categoriaHidrica().toUpperCase().trim()));
+                zona.setEsAnp(dto.esAnp());
+                zona.setMunicipioSede(dto.municipioSede());
+                zona.setNotasEspecificas(dto.notasEspecificas());
 
-                // 2. Convertir tipo de veda (String → Enum)
-                TipoVeda tipoVeda;
-                try {
-                    tipoVeda = TipoVeda.fromCsvValue(dto.tipoVeda());
-                } catch (IllegalArgumentException e) {
-                    log.warn("⚠️  Tipo de veda desconocido '{}' para Pez ID {}, skipping",
-                            dto.tipoVeda(), dto.pezId());
-                    continue;
-                }
-
-                // 3. Buscar si ya existe (por combinación única)
-                EspecieVeda veda = especieVedaRepository
-                        .findByPezAndZonaAndTipoVeda(pez, dto.zona(), tipoVeda)
-                        .orElse(new EspecieVeda());
-
-                // 4. Mapear DTO → Entity
-                veda.setPez(pez);
-                veda.setZona(dto.zona());
-                veda.setTipoVeda(tipoVeda);
-                veda.setInicioMes(dto.inicioMes());
-                veda.setInicioDia(dto.inicioDia());
-                veda.setFinMes(dto.finMes());
-                veda.setFinDia(dto.finDia());
-                veda.setFuenteDof(dto.fuenteDof());
-                veda.setInicioFijo(dto.inicioFijo().isBlank() ? null : LocalDate.parse(dto.inicioFijo()));
-                veda.setFinFijo(dto.finFijo().isBlank() ? null : LocalDate.parse(dto.finFijo()));
-
-                // 5. Save
-                especieVedaRepository.save(veda);
+                zonaRepository.save(zona);
                 contador++;
 
             } catch (Exception e) {
-                log.warn("⚠️  Error procesando veda para Pez ID {}: {}",
-                        dto.pezId(), e.getMessage());
+                log.warn("⚠️  Error procesando zona ID {}: {}",
+                        dto.id(), e.getMessage());
+            }
+        }
+
+        return contador;
+    }
+
+    // ============================================================================
+    // UPSERT DE REGULACIONES
+    // ============================================================================
+
+    /**
+     * Inserta o actualiza regulaciones en la base de datos.
+     *
+     * @param regulaciones Lista de DTOs parseados del CSV
+     * @return Cantidad de registros afectados
+     */
+    @Transactional
+    protected int upsertRegulaciones(List<RegulacionCsvRow> regulaciones) {
+        int contador = 0;
+
+        for (RegulacionCsvRow dto : regulaciones) {
+            try {
+                Pez pez = pezRepository.findById(dto.pezId())
+                        .orElse(null);
+                if (pez == null) {
+                    log.warn("⚠️  Pez ID {} no encontrado para regulación, skipping",
+                            dto.pezId());
+                    continue;
+                }
+
+                Zona zona = zonaRepository.findById(dto.zonaId())
+                        .orElse(null);
+                if (zona == null) {
+                    log.warn("⚠️  Zona ID {} no encontrada para regulación, skipping",
+                            dto.zonaId());
+                    continue;
+                }
+
+                Regulacion regulacion = regulacionRepository.findById(dto.id())
+                        .orElse(new Regulacion());
+
+                regulacion.setId(dto.id());
+                regulacion.setPez(pez);
+                regulacion.setZona(zona);
+                regulacion.setCategoriaPesca(CategoriaPesca.valueOf(dto.categoriaPesca().toUpperCase().trim()));
+                regulacion.setTallaMinima(dto.tallaMinima());
+                regulacion.setTallaMaxima(dto.tallaMaxima());
+                if (dto.tipoMedicion() != null && !dto.tipoMedicion().isBlank()) {
+                    regulacion.setTipoMedicion(TipoMedicion.valueOf(dto.tipoMedicion().toUpperCase().trim()));
+                }
+                regulacion.setCuotaDiaria(dto.cuotaDiaria());
+                regulacion.setRequierePermiso(dto.requierePermiso());
+
+                regulacionRepository.save(regulacion);
+                contador++;
+
+            } catch (Exception e) {
+                log.warn("⚠️  Error procesando regulación ID {}: {}",
+                        dto.id(), e.getMessage());
+            }
+        }
+
+        return contador;
+    }
+
+    // ============================================================================
+    // UPSERT DE PERIODO VEDAS
+    // ============================================================================
+
+    /**
+     * Inserta o actualiza periodos de veda en la base de datos.
+     *
+     * @param periodoVedas Lista de DTOs parseados del CSV
+     * @return Cantidad de registros afectados
+     */
+    @Transactional
+    protected int upsertPeriodoVedas(List<PeriodoVedaCsvRow> periodoVedas) {
+        int contador = 0;
+
+        for (PeriodoVedaCsvRow dto : periodoVedas) {
+            try {
+                Regulacion regulacion = regulacionRepository.findById(dto.regulacionId())
+                        .orElse(null);
+                if (regulacion == null) {
+                    log.warn("⚠️  Regulación ID {} no encontrada para periodo veda, skipping",
+                            dto.regulacionId());
+                    continue;
+                }
+
+                PeriodoVeda periodoVeda = periodoVedaRepository.findById(dto.id())
+                        .orElse(new PeriodoVeda());
+
+                periodoVeda.setId(dto.id());
+                periodoVeda.setRegulacion(regulacion);
+                periodoVeda.setTipoVeda(TipoVeda.valueOf(dto.tipoVeda().toUpperCase().trim()));
+                periodoVeda.setMesInicio(dto.mesInicio());
+                periodoVeda.setDiaInicio(dto.diaInicio());
+                periodoVeda.setMesFin(dto.mesFin());
+                periodoVeda.setDiaFin(dto.diaFin());
+                periodoVeda.setFuenteDof(dto.fuenteDof());
+
+                periodoVedaRepository.save(periodoVeda);
+                contador++;
+
+            } catch (Exception e) {
+                log.warn("⚠️  Error procesando periodo veda ID {}: {}",
+                        dto.id(), e.getMessage());
+            }
+        }
+
+        return contador;
+    }
+
+    // ============================================================================
+    // PROCESAMIENTO DE ARTE PESCA
+    // ============================================================================
+
+    private IngestionLog procesarArtePesca() {
+        try {
+            log.debug("Descargando CSV de artes pesca desde: {}", artePescaUrl);
+            byte[] csvBytes = descargarCsv(artePescaUrl);
+
+            String hash = calcularSha256(csvBytes);
+            log.debug("Hash SHA-256 calculado: {}", hash);
+
+            if (ingestionLogRepository.existsByHashSha256(hash)) {
+                log.info("⏭️  CSV de artes pesca sin cambios (hash: {}...), SKIP",
+                        hash.substring(0, 8));
+                return null;
+            }
+
+            List<ArtePescaCsvRow> artesPesca = csvParser.parseArtePesca(csvBytes);
+            log.info("✅ Parseados {} artes pesca", artesPesca.size());
+
+            IngestionLog registro = crearIngestionLog("arte_pesca.csv", hash,
+                    artesPesca.size(), EstadoIngestion.PROCESANDO);
+
+            int actualizadas = upsertArtePesca(artesPesca);
+            log.info("💾 {} artes pesca actualizadas/insertadas en BD", actualizadas);
+
+            registro.setEstado(EstadoIngestion.COMPLETADO);
+            return ingestionLogRepository.save(registro);
+
+        } catch (Exception e) {
+            log.error("❌ Error procesando artes pesca: {}", e.getMessage(), e);
+            throw new RuntimeException("Fallo en procesamiento de artes pesca", e);
+        }
+    }
+
+    @Transactional
+    protected int upsertArtePesca(List<ArtePescaCsvRow> artesPesca) {
+        int contador = 0;
+
+        for (ArtePescaCsvRow dto : artesPesca) {
+            try {
+                Regulacion regulacion = regulacionRepository.findById(dto.regulacionId())
+                        .orElse(null);
+                if (regulacion == null) {
+                    log.warn("⚠️  Regulación ID {} no encontrada para arte pesca, skipping",
+                            dto.regulacionId());
+                    continue;
+                }
+
+                ArtePesca artePesca = artePescaRepository.findById(dto.id())
+                        .orElse(new ArtePesca());
+
+                artePesca.setId(dto.id());
+                artePesca.setRegulacion(regulacion);
+                artePesca.setNombre(dto.nombre());
+                artePesca.setEsProhibido(dto.esProhibido());
+
+                artePescaRepository.save(artePesca);
+                contador++;
+
+            } catch (Exception e) {
+                log.warn("⚠️  Error procesando arte pesca ID {}: {}",
+                        dto.id(), e.getMessage());
             }
         }
 
