@@ -35,8 +35,8 @@ public class CsvParserService {
     /**
      * Parsea CSV de ESPECIES (Hoja 1 del Google Sheet).
      *
-     * Formato esperado (8 columnas):
-     * ID | NOMBRE COMÚN | ESPECIE | NOMBRE MAYA | TALLA MÍNIMA | HÁBITAT | TÉCNICA | ZONA
+     * Formato esperado (11 columnas):
+      * ID | NOMBRE COMÚN | ESPECIE | NOMBRE MAYA | TALLA MÍNIMA | HÁBITAT | TÉCNICA | ZONA | ... | MIGRATORIO | IMAGEN URL
      *
      * @param csvBytes Contenido crudo del CSV descargado desde Google Sheets
      * @return Lista de DTOs de especies, excluyendo filas inválidas
@@ -77,7 +77,8 @@ public class CsvParserService {
                         Boolean.parseBoolean(cols[6]),  //Invasiva
                         Boolean.parseBoolean(cols[7]),  //Protegida
                         cols[8].trim(),             //Tipo Agua
-                        Boolean.parseBoolean(cols[9])   //Migratorio
+                        Boolean.parseBoolean(cols[9]),  //Migratorio
+                        cols.length > 10 ? cols[10].trim() : null  //Imagen URL
                 ));
 
             } catch (Exception e) {
@@ -309,7 +310,7 @@ public class CsvParserService {
         String[] expectedCols = {
                 "ID", "NOMBRE COMÚN", "NOMBRE CIENTÍFICO", "NOMBRE MAYA",
                 "DESCRIPCIÓN", "RIESGO CIGUATERA", "ES INVASIVA", "ES PROTEGIDA",
-                "TIPO AGUA", "MIGRATORIO"
+                "TIPO AGUA", "MIGRATORIO", "IMAGEN URL"
         };
 
         String[] actualCols = parseCsvLine(headerLine);
