@@ -7,39 +7,13 @@ import { HeroCard } from '@/components/HeroCard'
 import { VedaCard } from '@/components/VedaCard'
 import { SpeciesCard } from '@/components/SpeciesCard'
 import { ZoneMapCard } from '@/components/ZoneMapCard'
-import { usePeces, useZonasConEstadoDetallado } from '@/api/hooks'
+import { usePeces, useZonasConEstadoDetallado, useVedasActivasDashboard } from '@/api/hooks'
 
 export function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('')
   const { data: peces, isLoading } = usePeces()
   const { zonas: zonasConEstado, isLoading: loadingZonas } = useZonasConEstadoDetallado()
-
-  const mockVedas = [
-    {
-      id: 1,
-      nombreComun: 'Mero (Grouper)',
-      tipoVeda: 'Veda Estacional',
-      fechaFin: '31 de Marzo',
-      descripcion: 'Restricción total en toda la costa de Yucatán.',
-      imagenUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBTpz37c15bnZBc4UaSXotAvKBYIbKBYtoBYtGOJpjzy7kdoBEdnA0da0B4SwkdFEUBl54qnJmDPc_FGM_b5JRWuEJrcqmaJIzBSXhdkeyuOBA6IG0Qx-Wc8PARHbbgVNuzwUplE8etNbKkIj08Wr5y9xuRNqeKGC_SQVIore1XbyNY1TZr3ataCcXX8HpAjcX4iVolc8ClBoGQkSK9oUXPXp9JDzXcFDKriWdhNWsWhet5Vt33ZES9j7ojYsb-SYXrMT4f6_wPKQK1'
-    },
-    {
-      id: 2,
-      nombreComun: 'Pulpo Maya',
-      tipoVeda: 'Veda Permanente',
-      fechaFin: 'Fuera de Temporada',
-      descripcion: 'Captura prohibida para preservar población juvenil.',
-      imagenUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBt9dhWvFND0vTr8MBVH-h4XPIg0RPCy-6RdkqlRK51WWw1UW-R7_lOCEGg29yjUqMbn3gmtfyuHBGVpM0adKf_5gepE9XszJqlhWhV2XXvTygBDvxoaV4VbQ64cuJIFI_eVcoiJ1JsihXJyUgk94QBa9tw4LjLjs2IgOZeXVjxyPxY3faYaPLgr4eCDqcSS-ERQUfTfPDx2swYBmcc2JtUmZHzeGyKAbVs0IwRyAF9f2scPtmqucNquIUbWP4jIL7bg8gYEDGi94gt'
-    },
-    {
-      id: 3,
-      nombreComun: 'Caracol Rosado',
-      tipoVeda: 'Protección Multi-Anual',
-      fechaFin: 'Especie Protegida',
-      descripcion: 'Prohibición absoluta bajo norma federal NOM-029.',
-      imagenUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBmfi1ZbhtM2IhElMSF7GEqRaXV1gyVMInhTMrwvJXfuMcaPD7DUQW9u9W6-ScpgUJlhcgqcPCs-8yeu1fMKahQNq1E0FLYfU89CC9evueyPbxT-U59gNAg0Uqu3jpJTkcXLvw6Mhpl5PpLCmQ3p7TcYJLnQQlQKCewHOVdFPsmQtWwzyKa_HT4n98wnGSz7VZUKF8rIvY_nOs1olq4pQ9LRoIyJCwCGKfysf4rZy1KTe5vw0qquHyAp6NIJZJE82mdMPjQFERZl0D8'
-    }
-  ]
+  const { vedas: vedasActivas, isLoading: loadingVedas } = useVedasActivasDashboard()
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -87,16 +61,34 @@ export function Dashboard() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mockVedas.map((veda) => (
-              <VedaCard
-                key={veda.id}
-                nombreComun={veda.nombreComun}
-                tipoVeda={veda.tipoVeda}
-                fechaFin={veda.fechaFin}
-                descripcion={veda.descripcion}
-                imagenUrl={veda.imagenUrl}
-              />
-            ))}
+            {loadingVedas ? (
+              <>
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="bg-surface-container-lowest p-6 rounded-xl animate-pulse">
+                    <div className="flex items-start gap-5">
+                      <div className="w-20 h-20 bg-surface-container-low rounded-lg" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 bg-surface-container-low rounded w-3/4" />
+                        <div className="h-3 bg-surface-container-low rounded w-1/2" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </>
+            ) : vedasActivas.length > 0 ? (
+              vedasActivas.map((veda) => (
+                <VedaCard
+                  key={veda.id}
+                  nombreComun={veda.nombreComun}
+                  tipoVeda={veda.tipoVeda}
+                  fechaFin={veda.fechaFin}
+                  descripcion={veda.descripcion}
+                  imagenUrl={veda.imagenUrl}
+                />
+              ))
+            ) : (
+              <p className="text-on-surface-variant col-span-full">No hay alertas de veda activas.</p>
+            )}
           </div>
         </section>
 

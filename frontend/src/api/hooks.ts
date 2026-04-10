@@ -46,6 +46,70 @@ export function usePeriodosVedaByPez(pezId: number) {
   })
 }
 
+export interface VedaActivaDashboard {
+  id: number
+  nombreComun: string
+  tipoVeda: string
+  fechaFin: string
+  descripcion: string
+  imagenUrl: string
+}
+
+export function useVedasActivasDashboard() {
+  const { data: vedasActuales, isLoading: loadingVedas } = usePeriodosVedaActuales()
+
+  if (loadingVedas || !vedasActuales) {
+    return { vedas: [], isLoading: !!loadingVedas }
+  }
+
+  const uniqueVedasMap = new Map<number, VedaActivaDashboard>()
+
+  vedasActuales.forEach((v) => {
+    if (uniqueVedasMap.has(v.pezId)) return
+
+    const diaFin = v.diaFin?.toString().padStart(2, '0') ?? '01'
+    const mesFinNum = v.mesFin
+    const mesFinNombre = formatearMes(mesFinNum)
+
+    let descripcion = ''
+    if (v.tipoVeda === 'PERMANENTE') {
+      descripcion = 'Captura prohibida permanentemente.'
+    } else if (v.tipoVeda === 'PROTECCION_MULTI_ANUAL') {
+      descripcion = 'Especie bajo protección multi-anual.'
+    } else {
+      descripcion = `Restricción vigente hasta el ${diaFin} de ${mesFinNombre}.`
+    }
+
+    uniqueVedasMap.set(v.pezId, {
+      id: v.id,
+      nombreComun: v.pezNombre,
+      tipoVeda: formatearTipoVeda(v.tipoVeda),
+      fechaFin: v.tipoVeda === 'PERMANENTE' ? 'Fuera de Temporada' : `${diaFin} de ${mesFinNombre}`,
+      descripcion,
+      imagenUrl: `https://picsum.photos/seed/${v.pezId}/200/200`,
+    })
+  })
+
+  return { vedas: Array.from(uniqueVedasMap.values()), isLoading: false }
+}
+
+function formatearTipoVeda(tipo: string): string {
+  switch (tipo) {
+    case 'PERMANENTE': return 'Veda Permanente'
+    case 'TEMPORAL_FIJA': return 'Veda Estacional'
+    case 'PROTECCION_MULTI_ANUAL': return 'Protección Multi-Anual'
+    default: return tipo.replace(/_/g, ' ')
+  }
+}
+
+function formatearMes(mes: number): string {
+  const meses = [
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+  ]
+  return meses[mes - 1] ?? mes.toString()
+}
+
 export function useRegulacionesByPez(pezId: number) {
   return useQuery({
     queryKey: ['regulaciones', 'pez', pezId],
