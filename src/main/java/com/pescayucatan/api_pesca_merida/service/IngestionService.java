@@ -400,6 +400,7 @@ public class IngestionService {
                     pez.setTipoAgua(com.pescayucatan.api_pesca_merida.enums.TipoAgua.valueOf(dto.tipoAgua().toUpperCase().trim()));
                 }
                 pez.setMigratorio(dto.migratorio());
+                pez.setImagenUrl(dto.imagenUrl());
 
                 pezRepository.save(pez);
                 contador++;

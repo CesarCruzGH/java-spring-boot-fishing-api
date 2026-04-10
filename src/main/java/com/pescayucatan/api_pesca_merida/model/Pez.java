@@ -46,4 +46,7 @@ public class Pez {
 
     @Column(name = "migratorio")
     private Boolean migratorio;
+
+    @Column(name = "imagen_url")
+    private String imagenUrl;
 }
