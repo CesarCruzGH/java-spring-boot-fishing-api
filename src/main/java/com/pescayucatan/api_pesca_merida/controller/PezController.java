@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @RestController
-@RequestMapping("/peces")
+@RequestMapping("/api/v1/peces")
 @RequiredArgsConstructor
 public class PezController {
 

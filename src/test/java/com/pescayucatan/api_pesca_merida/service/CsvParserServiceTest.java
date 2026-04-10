@@ -1,7 +1,7 @@
 package com.pescayucatan.api_pesca_merida.service;
 
 import com.pescayucatan.api_pesca_merida.infrastructure.csv.EspecieCsvRow;
-import com.pescayucatan.api_pesca_merida.infrastructure.csv.VedaCsvRow;
+import com.pescayucatan.api_pesca_merida.infrastructure.csv.PeriodoVedaCsvRow;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -178,147 +178,128 @@ class CsvParserServiceTest {
     class VedasTests {
 
         @Test
-        @DisplayName("Debe parsear CSV de vedas válido correctamente")
-        void testParseVedas_HappyPath() {
-            // Arrange
+        @DisplayName("Debe parsear CSV de periodos veda valido correctamente")
+        void testParsePeriodoVedas_HappyPath() {
+            // Arrange - Formato real: ID | Regulacion ID | Tipo Veda | Mes Inicio | Dia Inicio | Mes Fin | Dia Fin | Fuente DOF
             String csv = """
-                Pez ID,Nombre Común,Especie Científica,Zona,Tipo de Veda,Inicio mes,Inicio día,Fin mes,Fin día,Inicio fijo,Fin fijo,Fuente DOF
-                5,Mero,Epinephelus morio,Golfo,TEMPORAL FIJA,5,1,8,31,,,DOF-2024-001
-                7,Huachinango,Lutjanus campechanus,Caribe,TEMPORAL VARIABLE,3,15,5,30,,,DOF-2024-002
+                ID,Regulacion ID,Tipo Veda,Mes Inicio,Dia Inicio,Mes Fin,Dia Fin,Fuente DOF
+                1,5,TEMPORAL FIJA,5,1,8,31,DOF-2024-001
+                2,7,TEMPORAL VARIABLE,3,15,5,30,DOF-2024-002
                 """;
 
             // Act
-            List<VedaCsvRow> result = parser.parseVedas(csv.getBytes(StandardCharsets.UTF_8));
+            List<PeriodoVedaCsvRow> result = parser.parsePeriodoVedas(csv.getBytes(StandardCharsets.UTF_8));
 
             // Assert
-            assertEquals(2, result.size(), "Debe parsear 2 vedas");
+            assertEquals(2, result.size(), "Debe parsear 2 periodos veda");
 
             // Primera veda
-            VedaCsvRow meroVeda = result.get(0);
-            assertEquals(5, meroVeda.pezId());
-            assertEquals("Mero", meroVeda.nombreComun());
-            assertEquals("Epinephelus morio", meroVeda.especieCientifica());
-            assertEquals("Golfo", meroVeda.zona());
+            PeriodoVedaCsvRow meroVeda = result.get(0);
+            assertEquals(1L, meroVeda.id());
+            assertEquals(5L, meroVeda.regulacionId());
             assertEquals("TEMPORAL FIJA", meroVeda.tipoVeda());
-            assertEquals(5, meroVeda.inicioMes());
-            assertEquals(1, meroVeda.inicioDia());
-            assertEquals(8, meroVeda.finMes());
-            assertEquals(31, meroVeda.finDia());
+            assertEquals(5, meroVeda.mesInicio());
+            assertEquals(1, meroVeda.diaInicio());
+            assertEquals(8, meroVeda.mesFin());
+            assertEquals(31, meroVeda.diaFin());
             assertEquals("DOF-2024-001", meroVeda.fuenteDof());
         }
 
         @Test
         @DisplayName("Debe manejar vedas PERMANENTES con fechas null")
-        void testParseVedas_VedaPermanente() {
+        void testParsePeriodoVedas_VedaPermanente() {
             // Arrange
             String csv = """
-                Pez ID,Nombre Común,Especie Científica,Zona,Tipo de Veda,Inicio mes,Inicio día,Fin mes,Fin día,Inicio fijo,Fin fijo,Fuente DOF
-                5,Mero,Epinephelus morio,Golfo,PERMANENTE,,,,,,,DOF-2024-003
+                ID,Regulacion ID,Tipo Veda,Mes Inicio,Dia Inicio,Mes Fin,Dia Fin,Fuente DOF
+                1,5,PERMANENTE,,,,,,DOF-2024-003
                 """;
 
             // Act
-            List<VedaCsvRow> result = parser.parseVedas(csv.getBytes(StandardCharsets.UTF_8));
+            List<PeriodoVedaCsvRow> result = parser.parsePeriodoVedas(csv.getBytes(StandardCharsets.UTF_8));
 
             // Assert
             assertEquals(1, result.size());
-            VedaCsvRow veda = result.get(0);
+            PeriodoVedaCsvRow veda = result.get(0);
             assertEquals("PERMANENTE", veda.tipoVeda());
-            assertNull(veda.inicioMes(), "Inicio mes debe ser null en veda PERMANENTE");
-            assertNull(veda.inicioDia(), "Inicio día debe ser null en veda PERMANENTE");
-            assertNull(veda.finMes(), "Fin mes debe ser null en veda PERMANENTE");
-            assertNull(veda.finDia(), "Fin día debe ser null en veda PERMANENTE");
+            assertNull(veda.mesInicio(), "Mes inicio debe ser null en veda PERMANENTE");
+            assertNull(veda.diaInicio(), "Dia inicio debe ser null en veda PERMANENTE");
+            assertNull(veda.mesFin(), "Mes fin debe ser null en veda PERMANENTE");
+            assertNull(veda.diaFin(), "Dia fin debe ser null en veda PERMANENTE");
         }
 
         @Test
-        @DisplayName("Debe saltar filas sin Pez ID válido")
-        void testParseVedas_SinPezId() {
+        @DisplayName("Debe saltar filas sin ID valido")
+        void testParsePeriodoVedas_SinIdValido() {
             // Arrange
             String csv = """
-                Pez ID,Nombre Común,Especie Científica,Zona,Tipo de Veda,Inicio mes,Inicio día,Fin mes,Fin día,Inicio fijo,Fin fijo,Fuente DOF
-                5,Mero,Epinephelus morio,Golfo,TEMPORAL FIJA,5,1,8,31,,,DOF-2024-001
-                ,Robalo,Centropomus,Golfo,TEMPORAL FIJA,3,1,5,31,,,DOF-2024-002
-                INVALID,Huachinango,Lutjanus,Caribe,TEMPORAL FIJA,3,1,5,31,,,DOF-2024-003
-                7,Corvina,Cynoscion,Golfo,TEMPORAL FIJA,4,1,6,30,,,DOF-2024-004
+                ID,Regulacion ID,Tipo Veda,Mes Inicio,Dia Inicio,Mes Fin,Dia Fin,Fuente DOF
+                1,5,TEMPORAL FIJA,5,1,8,31,DOF-2024-001
+                ,7,TEMPORAL FIJA,3,1,5,31,DOF-2024-002
+                INVALID,9,TEMPORAL FIJA,4,1,6,30,DOF-2024-003
+                2,10,TEMPORAL FIJA,2,1,4,30,DOF-2024-004
                 """;
 
             // Act
-            List<VedaCsvRow> result = parser.parseVedas(csv.getBytes(StandardCharsets.UTF_8));
+            List<PeriodoVedaCsvRow> result = parser.parsePeriodoVedas(csv.getBytes(StandardCharsets.UTF_8));
 
             // Assert
-            assertEquals(2, result.size(), "Debe parsear solo filas con Pez ID válido");
-            assertEquals(5, result.get(0).pezId());
-            assertEquals(7, result.get(1).pezId());
+            assertEquals(2, result.size(), "Debe parsear solo filas con ID valido");
+            assertEquals(1L, result.get(0).id());
+            assertEquals(2L, result.get(1).id());
         }
 
         @Test
-        @DisplayName("Debe manejar zonas con comillas y comas")
-        void testParseVedas_ZonaConComillas() {
+        @DisplayName("Debe manejar valores no numericos en campos de fecha")
+        void testParsePeriodoVedas_FechasInvalidas() {
             // Arrange
             String csv = """
-                Pez ID,Nombre Común,Especie Científica,Zona,Tipo de Veda,Inicio mes,Inicio día,Fin mes,Fin día,Inicio fijo,Fin fijo,Fuente DOF
-                5,Mero,Epinephelus morio,"Golfo de México, Zona Norte y Centro",TEMPORAL FIJA,5,1,8,31,,,DOF-2024-001
+                ID,Regulacion ID,Tipo Veda,Mes Inicio,Dia Inicio,Mes Fin,Dia Fin,Fuente DOF
+                1,5,TEMPORAL FIJA,N/A,TBD,8,31,DOF-2024-001
                 """;
 
             // Act
-            List<VedaCsvRow> result = parser.parseVedas(csv.getBytes(StandardCharsets.UTF_8));
-
-            // Assert
-            assertEquals(1, result.size());
-            assertEquals("Golfo de México, Zona Norte y Centro", result.get(0).zona());
-        }
-
-        @Test
-        @DisplayName("Debe manejar valores no numéricos en campos de fecha")
-        void testParseVedas_FechasInvalidas() {
-            // Arrange
-            String csv = """
-                Pez ID,Nombre Común,Especie Científica,Zona,Tipo de Veda,Inicio mes,Inicio día,Fin mes,Fin día,Inicio fijo,Fin fijo,Fuente DOF
-                5,Mero,Epinephelus morio,Golfo,TEMPORAL FIJA,N/A,TBD,8,31,,,DOF-2024-001
-                """;
-
-            // Act
-            List<VedaCsvRow> result = parser.parseVedas(csv.getBytes(StandardCharsets.UTF_8));
+            List<PeriodoVedaCsvRow> result = parser.parsePeriodoVedas(csv.getBytes(StandardCharsets.UTF_8));
 
             // Assert
             assertEquals(1, result.size());
-            VedaCsvRow veda = result.get(0);
-            assertNull(veda.inicioMes(), "Valor 'N/A' debe convertirse a null");
-            assertNull(veda.inicioDia(), "Valor 'TBD' debe convertirse a null");
-            assertEquals(8, veda.finMes());
-            assertEquals(31, veda.finDia());
+            PeriodoVedaCsvRow veda = result.get(0);
+            assertNull(veda.mesInicio(), "Valor 'N/A' debe convertirse a null");
+            assertNull(veda.diaInicio(), "Valor 'TBD' debe convertirse a null");
+            assertEquals(8, veda.mesFin());
+            assertEquals(31, veda.diaFin());
         }
 
         @Test
         @DisplayName("Debe saltar filas incompletas sin romper el proceso")
-        void testParseVedas_FilaIncompleta() {
+        void testParsePeriodoVedas_FilaIncompleta() {
             // Arrange
             String csv = """
-                Pez ID,Nombre Común,Especie Científica,Zona,Tipo de Veda,Inicio mes,Inicio día,Fin mes,Fin día,Inicio fijo,Fin fijo,Fuente DOF
-                5,Mero,Epinephelus morio,Golfo,TEMPORAL FIJA,5,1,8,31,,,DOF-2024-001
-                7,Robalo,Centropomus
-                9,Huachinango,Lutjanus campechanus,Caribe,TEMPORAL FIJA,3,1,5,31,,,DOF-2024-002
+                ID,Regulacion ID,Tipo Veda,Mes Inicio,Dia Inicio,Mes Fin,Dia Fin,Fuente DOF
+                1,5,TEMPORAL FIJA,5,1,8,31,DOF-2024-001
+                2,7,TEMPORAL
+                3,9,TEMPORAL FIJA,3,1,5,31,DOF-2024-002
                 """;
 
             // Act
-            List<VedaCsvRow> result = parser.parseVedas(csv.getBytes(StandardCharsets.UTF_8));
+            List<PeriodoVedaCsvRow> result = parser.parsePeriodoVedas(csv.getBytes(StandardCharsets.UTF_8));
 
             // Assert
             assertEquals(2, result.size(), "Debe parsear solo las filas completas");
-            assertEquals(5, result.get(0).pezId());
-            assertEquals(9, result.get(1).pezId()); // Saltó la fila 7 incompleta
+            assertEquals(1L, result.get(0).id());
+            assertEquals(3L, result.get(1).id());
         }
 
         @Test
-        @DisplayName("Debe manejar comillas escapadas en campos de texto")
-        void testParseVedas_ComillasEscapadas() {
+        @DisplayName("Debe manejar comillas escapadas en fuente DOF")
+        void testParsePeriodoVedas_ComillasEscapadas() {
             // Arrange
             String csv = """
-                Pez ID,Nombre Común,Especie Científica,Zona,Tipo de Veda,Inicio mes,Inicio día,Fin mes,Fin día,Inicio fijo,Fin fijo,Fuente DOF
-                5,Mero,Epinephelus morio,Golfo,TEMPORAL FIJA,5,1,8,31,,,DOF 2024 ""Actualizado""
+                ID,Regulacion ID,Tipo Veda,Mes Inicio,Dia Inicio,Mes Fin,Dia Fin,Fuente DOF
+                1,5,TEMPORAL FIJA,5,1,8,31,DOF 2024 ""Actualizado""
                 """;
 
             // Act
-            List<VedaCsvRow> result = parser.parseVedas(csv.getBytes(StandardCharsets.UTF_8));
+            List<PeriodoVedaCsvRow> result = parser.parsePeriodoVedas(csv.getBytes(StandardCharsets.UTF_8));
 
             // Assert
             assertEquals(1, result.size());
@@ -337,27 +318,27 @@ class CsvParserServiceTest {
             String csv = "";
 
             // Act
-            List<VedaCsvRow> result = parser.parseVedas(csv.getBytes(StandardCharsets.UTF_8));
+            List<PeriodoVedaCsvRow> result = parser.parsePeriodoVedas(csv.getBytes(StandardCharsets.UTF_8));
 
             // Assert
             assertTrue(result.isEmpty(), "CSV vacío debe retornar lista vacía");
         }
 
         @Test
-        @DisplayName("Debe manejar líneas con solo espacios")
+        @DisplayName("Debe manejar lineas con espacios en blanco")
         void testParse_LineasConEspacios() {
             // Arrange
             String csv = """
-                Pez ID,Nombre Común,Especie Científica,Zona,Tipo de Veda,Inicio mes,Inicio día,Fin mes,Fin día,Inicio fijo,Fin fijo,Fuente DOF
-                5,  Mero  ,  Epinephelus morio  ,Golfo,TEMPORAL FIJA,5,1,8,31,,,DOF-2024-001
+                ID,Regulacion ID,Tipo Veda,Mes Inicio,Dia Inicio,Mes Fin,Dia Fin,Fuente DOF
+                1,  5  ,  TEMPORAL FIJA  ,  5  ,  1  ,  8  ,  31  ,  DOF-2024-001
                 """;
 
             // Act
-            List<VedaCsvRow> result = parser.parseVedas(csv.getBytes(StandardCharsets.UTF_8));
+            List<PeriodoVedaCsvRow> result = parser.parsePeriodoVedas(csv.getBytes(StandardCharsets.UTF_8));
 
             // Assert
             assertEquals(1, result.size());
-            assertEquals("Mero", result.get(0).nombreComun().trim());
+            assertEquals(5L, result.get(0).regulacionId());
         }
 
         @Test
