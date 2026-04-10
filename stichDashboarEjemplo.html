@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Pesca Yucatán - ¿Qué puedo pescar hoy?</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-fixed-dim": "#76d6d5",
+                      "surface-container-highest": "#d6e3fc",
+                      "surface-container-high": "#dde9ff",
+                      "secondary-fixed": "#93f2f2",
+                      "tertiary": "#6e0105",
+                      "on-tertiary": "#ffffff",
+                      "inverse-surface": "#243144",
+                      "inverse-primary": "#a3c9ff",
+                      "primary": "#003461",
+                      "surface-variant": "#d6e3fc",
+                      "primary-fixed-dim": "#a3c9ff",
+                      "on-error-container": "#93000a",
+                      "on-primary": "#ffffff",
+                      "primary-container": "#004b87",
+                      "surface-dim": "#cddbf3",
+                      "secondary-container": "#90efef",
+                      "tertiary-fixed": "#ffdad5",
+                      "on-surface": "#0e1c2e",
+                      "on-primary-fixed-variant": "#004882",
+                      "tertiary-container": "#8f1d18",
+                      "surface-bright": "#f8f9ff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary-fixed": "#002020",
+                      "on-primary-container": "#8abcff",
+                      "outline-variant": "#c2c6d1",
+                      "on-background": "#0e1c2e",
+                      "on-secondary-fixed-variant": "#004f4f",
+                      "surface-tint": "#27609d",
+                      "outline": "#727781",
+                      "on-secondary-container": "#006e6e",
+                      "background": "#f8f9ff",
+                      "on-error": "#ffffff",
+                      "secondary": "#006a6a",
+                      "error": "#ba1a1a",
+                      "primary-fixed": "#d3e4ff",
+                      "surface-container": "#e6eeff",
+                      "on-surface-variant": "#424750",
+                      "surface": "#f8f9ff",
+                      "on-tertiary-fixed-variant": "#8b1a16",
+                      "error-container": "#ffdad6",
+                      "tertiary-fixed-dim": "#ffb4aa",
+                      "on-tertiary-fixed": "#410001",
+                      "inverse-on-surface": "#ebf1ff",
+                      "on-secondary": "#ffffff",
+                      "surface-container-low": "#eff3ff",
+                      "on-tertiary-container": "#ffa095",
+                      "on-primary-fixed": "#001c38"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "fontFamily": {
+                      "headline": ["Manrope"],
+                      "body": ["Inter"],
+                      "label": ["Inter"]
+              }
+            },
+          },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+        .veda-border { border-left: 4px solid #6e0105; }
+        .coastal-glow { box-shadow: 0 20px 40px rgba(14, 28, 46, 0.06); }
+        .glass-nav { backdrop-filter: blur(12px); background-color: rgba(248, 249, 255, 0.8); }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen">
+<!-- SideNavBar Shell -->
+<aside class="h-screen w-64 fixed left-0 top-0 z-[60] bg-[#0e1c2e] dark:bg-[#070e17] flex flex-col py-8 hidden md:flex">
+    <div class="px-6 mb-10">
+        <h1 class="text-white font-['Manrope'] font-extrabold tracking-tighter text-2xl">Maritime Authority</h1>
+        <p class="text-[#d6e3fc]/60 text-xs font-['Inter'] uppercase tracking-widest mt-1">Yucatán Regulatory Portal</p>
+    </div>
+    <nav class="flex-1 space-y-1">
+        <a class="bg-[#003461] text-white rounded-r-full mr-4 px-6 py-3 font-semibold flex items-center gap-3 transition-all duration-150 translate-x-1" href="#">
+            <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+            Dashboard
+        </a>
+        <a class="text-[#d6e3fc]/70 hover:text-white px-6 py-3 flex items-center gap-3 hover:bg-[#003461]/50 transition-all duration-300" href="#">
+            <span class="material-symbols-outlined" data-icon="tsunami">tsunami</span>
+            Species Catalog
+        </a>
+        <a class="text-[#d6e3fc]/70 hover:text-white px-6 py-3 flex items-center gap-3 hover:bg-[#003461]/50 transition-all duration-300" href="#">
+            <span class="material-symbols-outlined" data-icon="map">map</span>
+            Zones &amp; Maps
+        </a>
+        <a class="text-[#d6e3fc]/70 hover:text-white px-6 py-3 flex items-center gap-3 hover:bg-[#003461]/50 transition-all duration-300" href="#">
+            <span class="material-symbols-outlined" data-icon="gavel">gavel</span>
+            Regulations
+        </a>
+        <a class="text-[#d6e3fc]/70 hover:text-white px-6 py-3 flex items-center gap-3 hover:bg-[#003461]/50 transition-all duration-300" href="#">
+            <span class="material-symbols-outlined" data-icon="settings_input_component">settings_input_component</span>
+            Data Pipeline
+        </a>
+    </nav>
+    <div class="px-6 mt-auto space-y-6">
+        <button class="w-full bg-tertiary text-white py-3 rounded-lg font-bold text-sm hover:opacity-90 transition-opacity">
+            Report Violation
+        </button>
+        <div class="pt-6 border-t border-white/10 space-y-2">
+            <a class="text-[#d6e3fc]/70 hover:text-white flex items-center gap-3 text-sm" href="#">
+                <span class="material-symbols-outlined text-lg" data-icon="help">help</span>
+                Support
+            </a>
+            <a class="text-[#d6e3fc]/70 hover:text-white flex items-center gap-3 text-sm" href="#">
+                <span class="material-symbols-outlined text-lg" data-icon="history">history</span>
+                Archive
+            </a>
+        </div>
+    </div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 min-h-screen flex flex-col">
+    <!-- TopAppBar Shell -->
+    <header class="bg-[#f8f9ff]/80 backdrop-blur-md sticky top-0 z-50 flex justify-between items-center px-8 py-4 w-full shadow-[0_20px_40px_rgba(14,28,46,0.06)]">
+        <div class="flex items-center gap-8">
+            <span class="text-xl font-black text-[#003461] uppercase tracking-wider font-['Manrope']">Pesca Yucatán</span>
+            <div class="hidden lg:flex items-center gap-6">
+                <a class="text-[#003461] font-bold border-b-2 border-[#003461] py-1" href="#">Overview</a>
+                <a class="text-[#0e1c2e]/60 hover:bg-[#eff3ff] transition-colors px-2 py-1 rounded" href="#">Analytics</a>
+                <a class="text-[#0e1c2e]/60 hover:bg-[#eff3ff] transition-colors px-2 py-1 rounded" href="#">Fleet Tracking</a>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="relative hidden sm:block">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+                <input class="bg-surface-container-low border-none rounded-full pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary w-64" placeholder="Search species or zone..." type="text"/>
+            </div>
+            <button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors">
+                <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+            </button>
+            <button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors">
+                <span class="material-symbols-outlined" data-icon="settings">settings</span>
+            </button>
+            <div class="w-10 h-10 rounded-full bg-primary-container overflow-hidden">
+                <img alt="User Profile Menu" class="w-full h-full object-cover" data-alt="professional portrait of a maritime official in a light blue shirt with a neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsMgIdcYEz75X4sXDSEZkjv3D9LWRbzQX1FMP9QeF-fwXbA-EmoK-qWi8hvCOalrFK_zAGp-sQck9pVdvzmed04YuTCX-8r2nXlQxOdUSFT5tBGQivxXm7NFjjN4livef-48YWaU9qUscAF3IGx41fZRPbnlnZ7SbJUu2NTgAHYRrWqrpKytVqNzOO_1dghwYPfrus_wRKxpxaNmJKGqlAoSpZY9YnrPoDsLV97DT_4sV7f-BwRO9UnEwZg_U--ydWudx8ocu4a8KJ"/>
+            </div>
+        </div>
+    </header>
+    <div class="p-8 space-y-12">
+        <!-- Current Fishing Status Section -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 bg-gradient-to-br from-primary to-primary-container p-10 rounded-2xl text-white relative overflow-hidden coastal-glow">
+                <div class="relative z-10 space-y-6">
+                    <div class="flex items-center gap-3">
+                        <span class="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-xs font-bold tracking-widest uppercase">Live Status</span>
+                        <span class="text-on-primary-container text-sm font-medium">Updated 5m ago</span>
+                    </div>
+                    <h2 class="text-5xl font-extrabold tracking-tight">¿Qué puedo pescar hoy?</h2>
+                    <p class="text-primary-fixed max-w-xl text-lg leading-relaxed">Las condiciones marítimas en el litoral yucateco son favorables. La visibilidad es de 12 millas náuticas con vientos moderados del Noreste.</p>
+                    <div class="flex gap-10 pt-4">
+                        <div>
+                            <p class="text-primary-fixed-dim text-xs uppercase tracking-widest font-bold mb-1">Mareas</p>
+                            <p class="text-2xl font-bold">Alta: 14:30h</p>
+                        </div>
+                        <div>
+                            <p class="text-primary-fixed-dim text-xs uppercase tracking-widest font-bold mb-1">Temperatura</p>
+                            <p class="text-2xl font-bold">27°C Coral</p>
+                        </div>
+                        <div>
+                            <p class="text-primary-fixed-dim text-xs uppercase tracking-widest font-bold mb-1">Oleaje</p>
+                            <p class="text-2xl font-bold">0.8m Calmo</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="absolute -right-20 -bottom-20 opacity-10">
+                    <span class="material-symbols-outlined text-[300px]" data-icon="sailing">sailing</span>
+                </div>
+            </div>
+            <div class="bg-surface-container-lowest p-8 rounded-2xl coastal-glow flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-on-surface font-bold text-lg">Data Sync Status</h3>
+                        <span class="material-symbols-outlined text-secondary" data-icon="sync">sync</span>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-2 h-2 rounded-full bg-secondary"></div>
+                            <div class="flex-1">
+                                <p class="text-sm font-semibold">Google Sheets Feed</p>
+                                <p class="text-xs text-on-surface-variant">Last update: Today, 08:42 AM</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-2 h-2 rounded-full bg-secondary"></div>
+                            <div class="flex-1">
+                                <p class="text-sm font-semibold">Regulatory API</p>
+                                <p class="text-xs text-on-surface-variant">Status: Synchronized</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="w-full mt-8 border-2 border-primary text-primary font-bold py-3 rounded-lg hover:bg-surface-container-low transition-colors">
+                    Force Manual Refresh
+                </button>
+            </div>
+        </section>
+        <!-- Veda Alerts Section -->
+        <section class="space-y-6">
+            <div class="flex items-end justify-between">
+                <div>
+                    <h2 class="text-3xl font-black text-on-surface tracking-tight">Alertas de Veda</h2>
+                    <p class="text-on-surface-variant mt-1">Especies actualmente en restricción total o parcial.</p>
+                </div>
+                <a class="text-primary font-bold flex items-center gap-1 group" href="#">
+                    Ver Calendario Completo
+                    <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+                </a>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Veda Card 1 -->
+                <div class="bg-surface-container-lowest p-6 rounded-xl veda-border coastal-glow flex items-start gap-5">
+                    <div class="w-20 h-20 bg-surface-container-low rounded-lg flex-shrink-0 overflow-hidden">
+                        <img alt="Mero (Grouper)" class="w-full h-full object-cover" data-alt="Close up of a large grouper fish swimming in clear blue water with sunlight rays" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTpz37c15bnZBc4UaSXotAvKBYIbKBYtoBYtGOJpjzy7kdoBEdnA0da0B4SwkdFEUBl54qnJmDPc_FGM_b5JRWuEJrcqmaJIzBSXhdkeyuOBA6IG0Qx-Wc8PARHbbgVNuzwUplE8etNbKkIj08Wr5y9xuRNqeKGC_SQVIore1XbyNY1TZr3ataCcXX8HpAjcX4iVolc8ClBoGQkSK9oUXPXp9JDzXcFDKriWdhNWsWhet5Vt33ZES9j7ojYsb-SYXrMT4f6_wPKQK1"/>
+                    </div>
+                    <div class="flex-1">
+                        <span class="inline-block px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed-variant text-[10px] font-bold rounded uppercase mb-2">Veda Estacional</span>
+                        <h4 class="text-xl font-bold text-on-surface">Mero (Grouper)</h4>
+                        <p class="text-sm text-tertiary font-semibold mt-1">Finaliza: 31 de Marzo</p>
+                        <p class="text-xs text-on-surface-variant mt-2">Restricción total en toda la costa de Yucatán.</p>
+                    </div>
+                </div>
+                <!-- Veda Card 2 -->
+                <div class="bg-surface-container-lowest p-6 rounded-xl veda-border coastal-glow flex items-start gap-5">
+                    <div class="w-20 h-20 bg-surface-container-low rounded-lg flex-shrink-0 overflow-hidden">
+                        <img alt="Pulpo Maya" class="w-full h-full object-cover" data-alt="detailed macro shot of an octopus camouflaging against sea floor rocks" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBt9dhWvFND0vTr8MBVH-h4XPIg0RPCy-6RdkqlRK51WWw1UW-R7_lOCEGg29yjUqMbn3gmtfyuHBGVpM0adKf_5gepE9XszJqlhWhV2XXvTygBDvxoaV4VbQ64cuJIFI_eVcoiJ1JsihXJyUgk94QBa9tw4LjLjs2IgOZeXVjxyPxY3faYaPLgr4eCDqcSS-ERQUfTfPDx2swYBmcc2JtUmZHzeGyKAbVs0IwRyAF9f2scPtmqucNquIUbWP4jIL7bg8gYEDGi94gt"/>
+                    </div>
+                    <div class="flex-1">
+                        <span class="inline-block px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed-variant text-[10px] font-bold rounded uppercase mb-2">Veda Permanente</span>
+                        <h4 class="text-xl font-bold text-on-surface">Pulpo Maya</h4>
+                        <p class="text-sm text-tertiary font-semibold mt-1">Fuera de Temporada</p>
+                        <p class="text-xs text-on-surface-variant mt-2">Captura prohibida para preservar población juvenil.</p>
+                    </div>
+                </div>
+                <!-- Veda Card 3 -->
+                <div class="bg-surface-container-lowest p-6 rounded-xl veda-border coastal-glow flex items-start gap-5">
+                    <div class="w-20 h-20 bg-surface-container-low rounded-lg flex-shrink-0 overflow-hidden">
+                        <img alt="Caracol Rosado" class="w-full h-full object-cover" data-alt="a pink conch shell resting on white tropical sand near water" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmfi1ZbhtM2IhElMSF7GEqRaXV1gyVMInhTMrwvJXfuMcaPD7DUQW9u9W6-ScpgUJlhcgqcPCs-8yeu1fMKahQNq1E0FLYfU89CC9evueyPbxT-U59gNAg0Uqu3jpJTkcXLvw6Mhpl5PpLCmQ3p7TcYJLnQQlQKCewHOVdFPsmQtWwzyKa_HT4n98wnGSz7VZUKF8rIvY_nOs1olq4pQ9LRoIyJCwCGKfysf4rZy1KTe5vw0qquHyAp6NIJZJE82mdMPjQFERZl0D8"/>
+                    </div>
+                    <div class="flex-1">
+                        <span class="inline-block px-2 py-0.5 bg-tertiary-fixed text-on-tertiary-fixed-variant text-[10px] font-bold rounded uppercase mb-2">Protección Multi-Anual</span>
+                        <h4 class="text-xl font-bold text-on-surface">Caracol Rosado</h4>
+                        <p class="text-sm text-tertiary font-semibold mt-1">Especie Protegida</p>
+                        <p class="text-xs text-on-surface-variant mt-2">Prohibición absoluta bajo norma federal NOM-029.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Open Species & Zones Grid -->
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            <!-- Open Species Section -->
+            <div class="xl:col-span-2 space-y-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-bold text-on-surface">Especies Autorizadas</h2>
+                    <div class="flex gap-2">
+                        <span class="material-symbols-outlined cursor-pointer hover:text-primary" data-icon="grid_view">grid_view</span>
+                        <span class="material-symbols-outlined cursor-pointer text-outline hover:text-primary" data-icon="format_list_bulleted">format_list_bulleted</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Species card 1 -->
+                    <div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/10 hover:shadow-lg transition-shadow flex gap-4 items-center">
+                        <div class="w-16 h-16 rounded-lg overflow-hidden bg-surface-container-low flex-shrink-0">
+                            <img alt="Boquinete" class="w-full h-full object-cover" data-alt="A silver fish with orange markings being held by a fisherman with the ocean background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsKOBOsMUSNodaeophmEEpsDja8AAMVb7buqbZmxacs7YRfLYJzrm10xz_XFDQhcia9y-gGXCSmE6bzKUTGUlER3PExfsrfvfHHvR64rpe2t83PgGxWQQrzb1T-licPof18GQkKMtAj8kReja90JqwZeaTHrJYBaAA1RGdwcRkZ3vZtXF8LIX7PaZQfKPNPHSNoLv4_TYjFTuKsUtSHB_DzaRn1q3XIjEGyqFXWb4xA2eDoaqVed-OncusXzMhk_-yFv6VKIfSjkVU"/>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-bold text-on-surface">Boquinete</h4>
+                                    <p class="text-[10px] uppercase font-bold tracking-widest text-secondary italic">Hogfish (Lachnolaimus)</p>
+                                </div>
+                                <span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-full">PERMITIDO</span>
+                            </div>
+                            <div class="mt-2 flex gap-2">
+                                <span class="text-[10px] bg-surface-container-high px-2 py-0.5 rounded text-on-surface-variant font-medium">Anzuelo</span>
+                                <span class="text-[10px] bg-surface-container-high px-2 py-0.5 rounded text-on-surface-variant font-medium">40cm min.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Species card 2 -->
+                    <div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/10 hover:shadow-lg transition-shadow flex gap-4 items-center">
+                        <div class="w-16 h-16 rounded-lg overflow-hidden bg-surface-container-low flex-shrink-0">
+                            <img alt="Sierra" class="w-full h-full object-cover" data-alt="Freshly caught king mackerel fish with metallic silver skin on a boat deck" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1mbL4e73KIy_C0rhVtOPiSbQws8eEbtQfizOEQrOFPjsmTax9tT2t91zFhf8Bn2UB5FT9ijHzAUoH_eJxSd0e3CGUd89P0rztXXYQms3buM9QWJKXY0V29U2X1EqrOHoRiKMvjT4QU1m-xm_ejvf2txdXgkQ09aaJwUwpGU7ONfOXGcyf9zhM8LzTB08BrGW84tJVnTn56G6Z84S4QTnzaBXDVEwrrKxNkMSymw1Nodl9AfXq2wokVc7S7xhtuMSqBVOcUakHbo1E"/>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-bold text-on-surface">Sierra</h4>
+                                    <p class="text-[10px] uppercase font-bold tracking-widest text-secondary italic">Spanish Mackerel</p>
+                                </div>
+                                <span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-full">PERMITIDO</span>
+                            </div>
+                            <div class="mt-2 flex gap-2">
+                                <span class="text-[10px] bg-surface-container-high px-2 py-0.5 rounded text-on-surface-variant font-medium">Currican</span>
+                                <span class="text-[10px] bg-surface-container-high px-2 py-0.5 rounded text-on-surface-variant font-medium">Sin límite</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Species card 3 -->
+                    <div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/10 hover:shadow-lg transition-shadow flex gap-4 items-center">
+                        <div class="w-16 h-16 rounded-lg overflow-hidden bg-surface-container-low flex-shrink-0">
+                            <img alt="Pargo" class="w-full h-full object-cover" data-alt="Close up of a red snapper fish displayed on crushed ice" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkFlY6kCNbyHvovD2FKl7W3hGW8IYoEIq4slqzt_Y7-kjO8THe-9Rf3GrEQyVG1AJpdCa7uDKaXtSISN41QDiWrFgEeMwSDrbU3WAkuogvNrBI9AkjuWLvqy13MkL2D2oxNAJ-iXEuinpZNvJyACNrjiLFY79eRoWOwzp6spGvXn37KTLSN9_JuFfypvhWOIMcJ-a2CBeNyNQFN1BRHlKpaimaU22GHU9x9xhQRXqkKVqwOlonODaZgi3M_6WFC6WGFKclcE1VbPzl"/>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-bold text-on-surface">Pargo</h4>
+                                    <p class="text-[10px] uppercase font-bold tracking-widest text-secondary italic">Snapper (Lutjanus)</p>
+                                </div>
+                                <span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-full">PERMITIDO</span>
+                            </div>
+                            <div class="mt-2 flex gap-2">
+                                <span class="text-[10px] bg-surface-container-high px-2 py-0.5 rounded text-on-surface-variant font-medium">Fondo</span>
+                                <span class="text-[10px] bg-surface-container-high px-2 py-0.5 rounded text-on-surface-variant font-medium">35cm min.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Species card 4 -->
+                    <div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/10 hover:shadow-lg transition-shadow flex gap-4 items-center">
+                        <div class="w-16 h-16 rounded-lg overflow-hidden bg-surface-container-low flex-shrink-0">
+                            <img alt="Langosta" class="w-full h-full object-cover" data-alt="Two spiny lobsters crawling over coral reef underwater" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgdjGh8gly5kET5MRe57Pxn1pS6AsdJ0KEp_obdUoUhwyPIsYu-7guJIhN78kZx18tPYcUijhGvVvONBiZW8KX4vO_GTHkqwOiODDRSSW1eXc7xYpUHo6okGxe0yVId3WG8oOabh4uct-nOLf74u23mJXgEDAC4po8v_Sp66I5y4yTqJzpp732eH9jTHTkFIOvEfYyOGRgITZGKcRkmW5Uvx2228Kk0dPDCNebsucxyFOTAlumkdjt4f2RVefccqu3soBWvvnGACza"/>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-bold text-on-surface">Langosta</h4>
+                                    <p class="text-[10px] uppercase font-bold tracking-widest text-secondary italic">Spiny Lobster</p>
+                                </div>
+                                <span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-full">PERMITIDO</span>
+                            </div>
+                            <div class="mt-2 flex gap-2">
+                                <span class="text-[10px] bg-surface-container-high px-2 py-0.5 rounded text-on-surface-variant font-medium">Trampa</span>
+                                <span class="text-[10px] bg-surface-container-high px-2 py-0.5 rounded text-on-surface-variant font-medium">Cola 13.5cm</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Zone Status Section -->
+            <div class="space-y-6">
+                <h2 class="text-2xl font-bold text-on-surface">Estatus por Zonas</h2>
+                <div class="bg-surface-container-lowest rounded-2xl overflow-hidden coastal-glow flex flex-col h-full">
+                    <div class="aspect-square bg-surface-container-high relative">
+                        <img alt="Yucatán Coast Map" class="w-full h-full object-cover" data-alt="simplified stylistic map of the Yucatan peninsula coastline with blue ocean and tan land" data-location="Yucatán Coast" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAopL77FL0v_UxlgsJjPrkN9l5rKSnSSk0ZXTHX3myHaaQCLJiniqznlQfG37AAdz5fZ2eJCjV2ebBYzPynh2lgwNRo9TSAT5bMCjODVviCUVFt4BhbzGverssXWCp5uolFe-kG5jnbOCqwzLQVpz0lyBkm5NEbgLSCEzUWZR7bcLIlcACnticOovsDxB_I7MRCboiskwi5Ehu4lJQlV3DtchcMYz1h8tFFhZC9o7Kjbg_Ret-wAvmDHbG1ZyK9bpIX1iPqN9i_JyFZ"/>
+                        <div class="absolute inset-0 bg-primary/10 pointer-events-none"></div>
+                        <!-- Map Markers Mockup -->
+                        <div class="absolute top-1/2 left-1/4 w-4 h-4 bg-secondary rounded-full border-2 border-white animate-pulse"></div>
+                        <div class="absolute top-1/3 right-1/4 w-4 h-4 bg-secondary rounded-full border-2 border-white animate-pulse"></div>
+                        <div class="absolute top-1/4 left-1/2 w-4 h-4 bg-tertiary rounded-full border-2 border-white"></div>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-semibold">Zona Oriente (Rio Lagartos)</span>
+                            <span class="material-symbols-outlined text-secondary" data-icon="check_circle">check_circle</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-semibold">Zona Centro (Progreso)</span>
+                            <span class="material-symbols-outlined text-secondary" data-icon="check_circle">check_circle</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-semibold">Zona Poniente (Celestún)</span>
+                            <span class="material-symbols-outlined text-tertiary" data-icon="warning">warning</span>
+                        </div>
+                        <div class="pt-4 border-t border-outline-variant/20">
+                            <p class="text-xs text-on-surface-variant leading-relaxed">
+                                <strong class="text-on-surface block mb-1">Nota del Navegante:</strong>
+                                Celestún presenta veda precautoria por marea roja. Se recomienda evitar pesca de moluscos.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer / Mobile Nav Shell -->
+    <footer class="mt-auto border-t border-outline-variant/10 bg-surface-container-lowest py-6 px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-on-surface-variant">
+        <p>© 2024 Pesca Yucatán - Autoridad Marítima del Estado. Todos los derechos reservados.</p>
+        <div class="flex gap-6">
+            <a class="hover:text-primary transition-colors" href="#">Normatividad Federal</a>
+            <a class="hover:text-primary transition-colors" href="#">Privacidad</a>
+            <a class="hover:text-primary transition-colors" href="#">Manual de Usuario</a>
+        </div>
+    </footer>
+</main>
+<!-- BottomNavBar Mobile Only -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 glass-nav border-t border-outline-variant/10 px-4 py-2 flex justify-around items-center z-50">
+    <button class="flex flex-col items-center gap-1 text-primary">
+        <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+        <span class="text-[10px] font-bold">Dashboard</span>
+    </button>
+    <button class="flex flex-col items-center gap-1 text-on-surface-variant">
+        <span class="material-symbols-outlined" data-icon="tsunami">tsunami</span>
+        <span class="text-[10px]">Catalog</span>
+    </button>
+    <button class="flex flex-col items-center gap-1 text-on-surface-variant">
+        <span class="material-symbols-outlined" data-icon="map">map</span>
+        <span class="text-[10px]">Zones</span>
+    </button>
+    <button class="flex flex-col items-center gap-1 text-on-surface-variant">
+        <span class="material-symbols-outlined" data-icon="gavel">gavel</span>
+        <span class="text-[10px]">Rules</span>
+    </button>
+</nav>
+<!-- Contextual FAB - Restricted to Dashboard -->
+<button class="fixed bottom-24 md:bottom-8 right-8 bg-primary text-white w-14 h-14 rounded-full flex items-center justify-center shadow-2xl hover:scale-105 transition-transform z-[70]">
+    <span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+</body></html>
