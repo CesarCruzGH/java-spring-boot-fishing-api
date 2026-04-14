@@ -43,6 +43,7 @@ export interface PeriodoVedaDto {
   regulacionId: number
   pezId: number
   pezNombre: string
+  pezImagenUrl: string | null
   tipoVeda: string
   mesInicio: number
   diaInicio: number | null
@@ -61,6 +62,17 @@ export interface IngestionLog {
   estado: string
   procesadoEn: string
   detalleError: string | null
+}
+
+export interface PezBasicoDto {
+  id: number
+  nombreComun: string
+}
+
+export interface VedaAgrupadaDto {
+  tipoVeda: string
+  tipoVedaLabel: string
+  peces: PezBasicoDto[]
 }
 
 class ApiClient {
@@ -116,6 +128,7 @@ export const api = {
   periodosVeda: {
     actuales: () => apiClient.get<PeriodoVedaDto[]>('/api/v1/periodos-veda/actuales'),
     byPez: (pezId: number) => apiClient.get<PeriodoVedaDto[]>(`/api/v1/periodos-veda/pez/${pezId}`),
+    agrupados: () => apiClient.get<VedaAgrupadaDto[]>('/api/v1/periodos-veda/agrupados'),
   },
   ingestion: {
     trigger: () => apiClient.post('/api/v1/ingestion/trigger'),

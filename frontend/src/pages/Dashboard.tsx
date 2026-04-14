@@ -3,7 +3,7 @@ import { ChevronRight, Fish, ArrowRight } from 'lucide-react'
 import { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { HeroCard } from '@/components/HeroCard'
+import { HeroSection } from '@/components/HeroSection'
 import { VedaCard } from '@/components/VedaCard'
 import { SpeciesCard } from '@/components/SpeciesCard'
 import { ZoneMapCard } from '@/components/ZoneMapCard'
@@ -17,7 +17,9 @@ export function Dashboard() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <div className="p-8 space-y-12 flex-1">
+      <HeroSection />
+
+      <div className="p-8 space-y-12 flex-1 bg-white">
         <div className="relative">
           <Input
             type="search"
@@ -27,19 +29,6 @@ export function Dashboard() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-3">
-            <HeroCard
-              titulo="¿Qué puedo pescar hoy?"
-              descripcion="Las condiciones marítimas en el litoral yucateco son favorables. La visibilidad es de 12 millas náuticas con vientos moderados del Noreste."
-              mareas="Alta: 14:30h"
-              temperatura="27°C Coral"
-              oleaje="0.8m Calmo"
-              lastUpdated="Actualizado hace 5m"
-            />
-          </div>
-        </section>
 
         <section className="space-y-6">
           <div className="flex items-end justify-between">

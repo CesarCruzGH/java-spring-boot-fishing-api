@@ -46,6 +46,13 @@ export function usePeriodosVedaByPez(pezId: number) {
   })
 }
 
+export function useVedasAgrupadas() {
+  return useQuery({
+    queryKey: ['periodos-veda', 'agrupados'],
+    queryFn: api.periodosVeda.agrupados,
+  })
+}
+
 export interface VedaActivaDashboard {
   id: number
   nombreComun: string
@@ -86,7 +93,7 @@ export function useVedasActivasDashboard() {
       tipoVeda: formatearTipoVeda(v.tipoVeda),
       fechaFin: v.tipoVeda === 'PERMANENTE' ? 'Fuera de Temporada' : `${diaFin} de ${mesFinNombre}`,
       descripcion,
-      imagenUrl: `https://picsum.photos/seed/${v.pezId}/200/200`,
+      imagenUrl: v.pezImagenUrl ?? `https://picsum.photos/seed/${v.pezId}/200/200`,
     })
   })
 

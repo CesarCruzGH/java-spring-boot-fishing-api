@@ -2,30 +2,32 @@ import { Link } from 'react-router-dom'
 import { Fish, Menu, X } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { MegaMenu } from '@/components/MegaMenu'
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link to="/" className="flex items-center gap-2">
-          <Fish className="h-6 w-6 text-primary" />
-          <span className="font-semibold text-lg text-text-primary">Pesca Yucatán</span>
+    <header className="absolute top-0 left-0 z-50 w-full border-b border-white/10 bg-transparent">
+      <div className="container mx-auto flex h-16 items-center gap-8 px-4">
+        <Link to="/" className="flex items-center gap-2 shrink-0">
+          <Fish className="h-6 w-6 text-white" />
+          <span className="font-semibold text-lg text-white">Pesca Yucatán</span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
-          <Link to="/" className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors">
+          <Link to="/" className="text-sm font-medium text-white/80 hover:text-white transition-colors">
             Inicio
           </Link>
-          <Link to="/especies" className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors">
+          <Link to="/especies" className="text-sm font-medium text-white/80 hover:text-white transition-colors">
             Especies
           </Link>
-          <Link to="/zonas" className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors">
+          <MegaMenu />
+          <Link to="/zonas" className="text-sm font-medium text-white/80 hover:text-white transition-colors">
             Zonas
           </Link>
           <Link to="/admin">
-            <Button variant="ghost" size="sm">Admin</Button>
+            <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">Admin</Button>
           </Link>
         </nav>
 
