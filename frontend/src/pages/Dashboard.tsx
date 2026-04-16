@@ -7,11 +7,11 @@ import { HeroSection } from '@/components/HeroSection'
 import { VedaCard } from '@/components/VedaCard'
 import { SpeciesCard } from '@/components/SpeciesCard'
 import { ZoneMapCard } from '@/components/ZoneMapCard'
-import { usePeces, useZonasConEstadoDetallado, useVedasActivasDashboard } from '@/api/hooks'
+import { usePecesAbiertos, useZonasConEstadoDetallado, useVedasActivasDashboard } from '@/api/hooks'
 
 export function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('')
-  const { data: peces, isLoading } = usePeces()
+  const { data: pecesAbiertos, isLoading } = usePecesAbiertos()
   const { zonas: zonasConEstado, isLoading: loadingZonas } = useZonasConEstadoDetallado()
   const { vedas: vedasActivas, isLoading: loadingVedas } = useVedasActivasDashboard()
 
@@ -19,7 +19,7 @@ export function Dashboard() {
     <div className="min-h-screen flex flex-col">
       <HeroSection />
 
-      <div className="p-8 space-y-12 flex-1 bg-white">
+      <div className="p-8 space-y-12 flex-1">
         <div className="relative">
           <Input
             type="search"
@@ -68,7 +68,9 @@ export function Dashboard() {
               vedasActivas.map((veda) => (
                 <VedaCard
                   key={veda.id}
+                  id={veda.id}
                   nombreComun={veda.nombreComun}
+                  nombreCientifico={veda.nombreCientifico}
                   tipoVeda={veda.tipoVeda}
                   fechaFin={veda.fechaFin}
                   descripcion={veda.descripcion}
@@ -112,13 +114,17 @@ export function Dashboard() {
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {peces?.slice(0, 4).map((pez) => (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                {pecesAbiertos?.slice(0, 6).map((pez) => (
                   <SpeciesCard
                     key={pez.id}
+                    id={pez.id}
                     nombreComun={pez.nombreComun}
+                    nombreMaya={pez.nombreMaya}
                     nombreCientifico={pez.nombreCientifico}
-                    estado="open"
+                    imagenUrl={pez.imagenUrl}
+                    tipoAgua={pez.tipoAgua}
+                    riesgoCiguatera={pez.riesgoCiguatera}
                   />
                 ))}
               </div>

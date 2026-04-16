@@ -11,6 +11,7 @@ export interface Pez {
   esProtegida: boolean
   tipoAgua: string
   migratorio: boolean
+  imagenUrl: string | null
 }
 
 export interface Zona {
@@ -43,6 +44,7 @@ export interface PeriodoVedaDto {
   regulacionId: number
   pezId: number
   pezNombre: string
+  pezNombreCientifico: string | null
   pezImagenUrl: string | null
   tipoVeda: string
   mesInicio: number
@@ -115,6 +117,7 @@ export const apiClient = new ApiClient(API_BASE_URL)
 export const api = {
   peces: {
     list: () => apiClient.get<Pez[]>('/api/v1/peces'),
+    abiertos: () => apiClient.get<Pez[]>('/api/v1/peces/abiertos'),
     getById: (id: number) => apiClient.get<Pez>(`/api/v1/peces/${id}`),
   },
   zonas: {

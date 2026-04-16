@@ -1,173 +1,108 @@
-import { Anchor, Layers, Grid, Waves, Flame, CircleDot, House } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 
 interface SpeciesCardProps {
+  id: number
   nombreComun: string
   nombreMaya?: string | null
   nombreCientifico: string
-  estado: 'open' | 'closed' | 'invasive'
-  categoria?: string
-  imagenUrl?: string
-  riesgoCiguatera?: string
-  habitat?: string
-  tallaMinima?: string
-  artePesca?: string[]
-  zona?: string
-  onClick?: () => void
+  imagenUrl?: string | null
+  tipoAgua?: string | null
+  riesgoCiguatera?: string | null
   className?: string
 }
 
-const ARTE_PESCA_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  'Anzuelo': Anchor,
-  'Currican': Waves,
-  'Trampa': Layers,
-  'Red': Grid,
-  'Arpón': Flame,
-  'Lazo': CircleDot,
-  'Casitas': House,
-  'default': Anchor,
+const CIGUATERA_COLORS: Record<string, string> = {
+  ALTO: 'text-error',
+  MEDIO: 'text-warning',
+  BAJO: 'text-secondary',
+  NULO: 'text-secondary',
 }
 
-const CIGUATERA_COLORS: Record<string, string> = {
-  'Alto': 'text-tertiary',
-  'Medio': 'text-warning',
-  'Bajo': 'text-secondary',
-  'Nulo': 'text-secondary',
+const TIPO_AGUA_LABELS: Record<string, string> = {
+  DULCE: 'Dulceacuícola',
+  SALADA: 'Marino',
+  SALOBRE: 'Salobre',
 }
 
 export function SpeciesCard({
+  id,
   nombreComun,
   nombreMaya,
   nombreCientifico,
-  estado,
-  categoria,
   imagenUrl,
+  tipoAgua,
   riesgoCiguatera,
-  habitat,
-  tallaMinima,
-  artePesca,
-  zona,
-  onClick,
-  className,
+  className
 }: SpeciesCardProps) {
-  const estadoLabels = {
-    open: 'Permitido',
-    closed: 'En Veda',
-    invasive: 'Fomento',
-  }
-
-  const estadoVariants = {
-    open: 'secondary-container',
-    closed: 'tertiary',
-    invasive: 'error',
-  }
-
-  const borderVariants = {
-    open: 'border-l-4 border-secondary/40',
-    closed: 'border-l-4 border-tertiary veda-border',
-    invasive: 'border-l-4 border-error/40',
-  }
-
   return (
-    <article
-      onClick={onClick}
+    <Link
+      to={`/especies/${id}`}
       className={cn(
-        'bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group cursor-pointer',
-        borderVariants[estado],
+        'group relative flex flex-col bg-transparent rounded-2xl glow-border transition-all duration-500 hover:scale-[1.02] overflow-hidden',
         className
       )}
     >
-      <div className="relative h-56 overflow-hidden">
+      <div className="relative h-72 overflow-hidden">
         {imagenUrl ? (
           <img
             src={imagenUrl}
             alt={nombreComun}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-cover mix-blend-screen opacity-80 group-hover:opacity-100 transition-opacity"
           />
         ) : (
-          <div className="w-full h-full bg-surface-container-high flex items-center justify-center">
+          <div className="w-full h-full bg-surface-container-low flex items-center justify-center">
             <span className="text-6xl opacity-30">🐟</span>
           </div>
         )}
-        <div className="absolute top-4 left-4">
-          <span
-            className={cn(
-              'px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest',
-              `bg-${estadoVariants[estado]} text-on-${estadoVariants[estado]}`
-            )}
-          >
-            {estadoLabels[estado]}
-          </span>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a1325] via-transparent to-transparent" />
+        <div className="absolute top-4 right-4">
+          {tipoAgua && (
+            <span className="bg-tertiary-container/40 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase border border-tertiary/20 text-tertiary">
+              {TIPO_AGUA_LABELS[tipoAgua] || tipoAgua}
+            </span>
+          )}
         </div>
       </div>
 
-      <div className="p-6 flex-1 flex flex-col">
-        <div className="mb-4">
-          <div className="flex justify-between items-start gap-2">
-            <h3 className="text-xl font-bold text-primary leading-tight">{nombreComun}</h3>
-            {categoria && (
-              <span className="text-xs font-bold text-secondary-container bg-on-secondary-container px-2 py-0.5 rounded text-[10px] flex-shrink-0">
-                {categoria}
-              </span>
-            )}
-          </div>
-          {nombreMaya && (
-            <p className="text-secondary font-bold text-xs mt-1 uppercase tracking-wider">
-              {nombreMaya} <span className="text-outline-variant font-normal lowercase ml-1">(maya)</span>
-            </p>
-          )}
-          <p className="text-on-surface-variant italic text-xs font-body mt-0.5">{nombreCientifico}</p>
-        </div>
-
-        {(riesgoCiguatera || habitat) && (
-          <div className="grid grid-cols-2 gap-3 mb-6">
-            {riesgoCiguatera && (
-              <div className="bg-surface-container-low p-2 rounded-lg">
-                <span className="text-[9px] font-bold text-outline block uppercase">Ciguatera</span>
-                <span className={cn('text-xs font-bold', CIGUATERA_COLORS[riesgoCiguatera] || 'text-on-surface')}>
-                  {riesgoCiguatera}
-                </span>
-              </div>
-            )}
-            {habitat && (
-              <div className="bg-surface-container-low p-2 rounded-lg">
-                <span className="text-[9px] font-bold text-outline block uppercase">Hábitat</span>
-                <span className="text-xs font-bold text-on-surface">{habitat}</span>
-              </div>
-            )}
-          </div>
+      <div className="p-6 pt-2">
+        <h3 className="text-2xl font-headline font-bold text-primary mb-1">
+          {nombreComun}
+        </h3>
+        {nombreMaya && (
+          <p className="text-xs font-label text-tertiary/60 mb-1 uppercase tracking-wider">
+            {nombreMaya} <span className="text-on-surface-variant font-normal lowercase ml-1">(maya)</span>
+          </p>
         )}
+        <p className="text-xs font-label text-tertiary/60 mb-4 italic">
+          {nombreCientifico}
+        </p>
 
-        <div className="mt-auto pt-4 border-t border-outline-variant/10 space-y-3">
-          {tallaMinima && (
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold text-outline uppercase tracking-tighter">Talla Mínima</span>
-              <span className="text-sm font-black text-primary">{tallaMinima}</span>
+        <div className="space-y-3 mb-6">
+          {tipoAgua && (
+            <div className="flex justify-between text-xs border-b border-white/5 pb-2">
+              <span className="text-on-surface-variant uppercase tracking-tighter">Hábitat</span>
+              <span className="text-on-surface font-medium">{TIPO_AGUA_LABELS[tipoAgua] || tipoAgua}</span>
             </div>
           )}
-          {artePesca && artePesca.length > 0 && (
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold text-outline uppercase tracking-tighter">Arte de Pesca</span>
-              <div className="flex gap-2">
-                {artePesca.slice(0, 3).map((arte) => {
-                  const IconComponent = ARTE_PESCA_ICONS[arte] || ARTE_PESCA_ICONS['default']
-                  return (
-                    <span key={arte} title={arte}>
-                      <IconComponent className="h-5 w-5 text-outline" />
-                    </span>
-                  )
-                })}
-              </div>
+          {riesgoCiguatera && (
+            <div className="flex justify-between text-xs border-b border-white/5 pb-2">
+              <span className="text-on-surface-variant uppercase tracking-tighter">Ciguatera</span>
+              <span className={cn('font-medium', CIGUATERA_COLORS[riesgoCiguatera] || 'text-on-surface')}>
+                {riesgoCiguatera}
+              </span>
             </div>
           )}
-          {zona && (
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold text-outline uppercase tracking-tighter">Zona</span>
-              <span className="text-xs font-medium text-on-surface-variant">{zona}</span>
-            </div>
-          )}
+          <div className="flex justify-between text-xs pb-2">
+            <span className="text-on-surface-variant uppercase tracking-tighter">Estatus</span>
+            <span className="text-tertiary font-bold">AUTORIZADO</span>
+          </div>
         </div>
+
+        <button className="w-full py-3 abyssal-gradient text-on-primary-fixed font-headline font-bold text-xs uppercase tracking-widest rounded-lg shadow-[0_0_20px_rgba(152,203,255,0.2)]">
+          Ver Detalles
+        </button>
       </div>
-    </article>
+    </Link>
   )
 }

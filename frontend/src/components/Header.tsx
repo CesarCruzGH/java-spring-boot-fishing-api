@@ -8,7 +8,14 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
-    <header className="absolute top-0 left-0 z-50 w-full border-b border-white/10 bg-transparent">
+    <header 
+      className="fixed top-0 left-0 z-50 w-full"
+      style={{ 
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        backgroundColor: 'rgba(0, 0, 0, 0.6)'
+      }}
+    >
       <div className="container mx-auto flex h-16 items-center gap-8 px-4">
         <Link to="/" className="flex items-center gap-2 shrink-0">
           <Fish className="h-6 w-6 text-white" />

@@ -16,6 +16,13 @@ export function usePez(id: number) {
   })
 }
 
+export function usePecesAbiertos() {
+  return useQuery({
+    queryKey: ['peces', 'abiertos'],
+    queryFn: api.peces.abiertos,
+  })
+}
+
 export function useZonas() {
   return useQuery({
     queryKey: ['zonas'],
@@ -56,6 +63,7 @@ export function useVedasAgrupadas() {
 export interface VedaActivaDashboard {
   id: number
   nombreComun: string
+  nombreCientifico: string | null
   tipoVeda: string
   fechaFin: string
   descripcion: string
@@ -90,6 +98,7 @@ export function useVedasActivasDashboard() {
     uniqueVedasMap.set(v.pezId, {
       id: v.id,
       nombreComun: v.pezNombre,
+      nombreCientifico: v.pezNombreCientifico,
       tipoVeda: formatearTipoVeda(v.tipoVeda),
       fechaFin: v.tipoVeda === 'PERMANENTE' ? 'Fuera de Temporada' : `${diaFin} de ${mesFinNombre}`,
       descripcion,

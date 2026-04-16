@@ -95,20 +95,18 @@ export function SpeciesCatalog() {
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {visiblePeces.map((pez) => {
-                const isInVeda = vedasActivasIds.has(pez.id)
-                return (
-                  <SpeciesCard
-                    key={pez.id}
-                    nombreComun={pez.nombreComun}
-                    nombreMaya={pez.nombreMaya}
-                    nombreCientifico={pez.nombreCientifico}
-                    estado={isInVeda ? 'closed' : 'open'}
-                    riesgoCiguatera={pez.riesgoCiguatera ?? undefined}
-                    habitat={pez.tipoAgua}
-                  />
-                )
-              })}
+              {visiblePeces.map((pez) => (
+                <SpeciesCard
+                  key={pez.id}
+                  id={pez.id}
+                  nombreComun={pez.nombreComun}
+                  nombreMaya={pez.nombreMaya}
+                  nombreCientifico={pez.nombreCientifico}
+                  imagenUrl={pez.imagenUrl}
+                  tipoAgua={pez.tipoAgua}
+                  riesgoCiguatera={pez.riesgoCiguatera}
+                />
+              ))}
             </div>
 
             <Pagination
