@@ -134,6 +134,14 @@ export function useRegulacionesByPez(pezId: number) {
   })
 }
 
+export function useRegulacionesByPezDetalle(pezId: number) {
+  return useQuery({
+    queryKey: ['regulaciones', 'pez', pezId, 'detalle'],
+    queryFn: () => api.regulaciones.byPezDetalle(pezId),
+    enabled: !!pezId,
+  })
+}
+
 export function useRegulacionesByZona(zonaId: number) {
   return useQuery({
     queryKey: ['regulaciones', 'zona', zonaId],

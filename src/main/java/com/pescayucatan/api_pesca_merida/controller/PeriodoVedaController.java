@@ -61,7 +61,7 @@ public class PeriodoVedaController {
                     List<PezBasicoDto> pecesUnicos = vedasDelTipo.stream()
                             .map(v -> v.getRegulacion().getPez())
                             .distinct()
-                            .map(pez -> new PezBasicoDto(pez.getId(), pez.getNombreComun()))
+                            .map(pez -> new PezBasicoDto(pez.getId(), pez.getNombreComun(), pez.getImagenUrl()))
                             .toList();
 
                     return new VedaAgrupadaDto(

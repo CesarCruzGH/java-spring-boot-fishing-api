@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "regulacion")
@@ -48,4 +50,7 @@ public class Regulacion {
 
     @Column(name = "requiere_permiso")
     private Boolean requierePermiso;
+
+    @OneToMany(mappedBy = "regulacion", fetch = FetchType.LAZY)
+    private List<ArtePesca> artePesca = new ArrayList<>();
 }

@@ -1,91 +1,66 @@
-import { Link } from 'react-router-dom'
-import { Fish, Menu, X } from 'lucide-react'
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
+import { Link, useLocation } from 'react-router-dom'
+import { Waves } from 'lucide-react'
 import { MegaMenu } from '@/components/MegaMenu'
+import { cn } from '@/lib/utils'
 
 export function Header() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const location = useLocation()
+
+  const isActive = (path: string) => location.pathname === path
 
   return (
-    <header 
-      className="fixed top-0 left-0 z-50 w-full"
-      style={{ 
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        backgroundColor: 'rgba(0, 0, 0, 0.6)'
-      }}
-    >
-      <div className="container mx-auto flex h-16 items-center gap-8 px-4">
-        <Link to="/" className="flex items-center gap-2 shrink-0">
-          <Fish className="h-6 w-6 text-white" />
-          <span className="font-semibold text-lg text-white">Pesca Yucatán</span>
+    <header className="fixed top-0 w-full z-50 bg-[#000516]/60 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,220,229,0.08)]">
+      <div className="flex justify-between items-center px-12 py-6 w-full max-w-screen-2xl mx-auto">
+        <Link to="/" className="flex items-center gap-3 shrink-0">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-tertiary flex items-center justify-center shadow-[0_0_15px_rgba(0,220,229,0.4)]">
+            <Waves className="h-5 w-5 text-[#001d33]" />
+          </div>
+          <span className="text-2xl font-black text-primary tracking-tighter font-headline">Pesca Yucatán</span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-6">
-          <Link to="/" className="text-sm font-medium text-white/80 hover:text-white transition-colors">
+        <nav className="hidden md:flex items-center gap-10 font-headline tracking-tight font-bold uppercase text-sm">
+          <Link 
+            to="/" 
+            className={cn(
+              'pb-2 transition-colors duration-200',
+              isActive('/') ? 'text-white' : 'text-[#dae2fc]/70 hover:text-white'
+            )}
+          >
             Inicio
           </Link>
-          <Link to="/especies" className="text-sm font-medium text-white/80 hover:text-white transition-colors">
+          <Link 
+            to="/especies" 
+            className={cn(
+              'pb-2 transition-colors duration-200',
+              isActive('/especies') ? 'text-tertiary border-b-2 border-tertiary bio-glow' : 'text-[#dae2fc]/70 hover:text-white'
+            )}
+          >
             Especies
           </Link>
           <MegaMenu />
-          <Link to="/zonas" className="text-sm font-medium text-white/80 hover:text-white transition-colors">
+          <Link 
+            to="/zonas" 
+            className={cn(
+              'pb-2 transition-colors duration-200',
+              isActive('/zonas') ? 'text-white' : 'text-[#dae2fc]/70 hover:text-white'
+            )}
+          >
             Zonas
           </Link>
-          <Link to="/admin">
-            <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">Admin</Button>
-          </Link>
         </nav>
 
-        <button
-          type="button"
-          className="md:hidden p-2 touch-target"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label="Toggle menu"
-        >
-          {mobileMenuOpen ? (
-            <X className="h-6 w-6 text-text-primary" />
-          ) : (
-            <Menu className="h-6 w-6 text-text-primary" />
-          )}
-        </button>
+        <div className="flex items-center gap-6">
+          <Link 
+            to="/admin"
+            className="flex items-center gap-2 pl-2 pr-4 py-2 rounded-full bg-surface-container-low border border-outline-variant/20 hover:border-tertiary/40 transition-all group"
+          >
+            <span className="material-symbols-outlined text-primary text-lg">account_circle</span>
+            <span className="text-xs font-headline font-bold uppercase tracking-wider text-on-surface-variant group-hover:text-tertiary transition-colors">Portal</span>
+          </Link>
+        </div>
       </div>
 
-      {mobileMenuOpen && (
-        <nav className="md:hidden border-t border-border bg-white">
-          <div className="container px-4 py-4 flex flex-col gap-4">
-            <Link
-              to="/"
-              className="text-sm font-medium text-text-secondary hover:text-text-primary touch-target"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Inicio
-            </Link>
-            <Link
-              to="/especies"
-              className="text-sm font-medium text-text-secondary hover:text-text-primary touch-target"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Especies
-            </Link>
-            <Link
-              to="/zonas"
-              className="text-sm font-medium text-text-secondary hover:text-text-primary touch-target"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Zonas
-            </Link>
-            <Link
-              to="/admin"
-              className="text-sm font-medium text-text-secondary hover:text-text-primary touch-target"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Admin
-            </Link>
-          </div>
-        </nav>
-      )}
+      <div className="bg-gradient-to-b from-surface-container-high to-transparent h-[1px] w-full absolute bottom-0" />
     </header>
   )
 }

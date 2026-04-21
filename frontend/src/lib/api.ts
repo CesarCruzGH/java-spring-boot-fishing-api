@@ -69,12 +69,32 @@ export interface IngestionLog {
 export interface PezBasicoDto {
   id: number
   nombreComun: string
+  imagenUrl: string | null
 }
 
 export interface VedaAgrupadaDto {
   tipoVeda: string
   tipoVedaLabel: string
   peces: PezBasicoDto[]
+}
+
+export interface ArtePescaDto {
+  id: number
+  nombre: string
+  esProhibido: boolean
+}
+
+export interface RegulacionConArtesDto {
+  id: number
+  zonaId: number
+  zonaNombre: string
+  categoriaPesca: string | null
+  tallaMinima: number | null
+  tallaMaxima: number | null
+  tipoMedicion: string | null
+  cuotaDiaria: number | null
+  requierePermiso: boolean
+  artesPesca: ArtePescaDto[]
 }
 
 class ApiClient {
@@ -126,6 +146,7 @@ export const api = {
   },
   regulaciones: {
     byPez: (pezId: number) => apiClient.get<RegulacionDto[]>(`/api/v1/regulaciones/pez/${pezId}`),
+    byPezDetalle: (pezId: number) => apiClient.get<RegulacionConArtesDto[]>(`/api/v1/regulaciones/pez/${pezId}/detalle`),
     byZona: (zonaId: number) => apiClient.get<RegulacionDto[]>(`/api/v1/regulaciones/zona/${zonaId}`),
   },
   periodosVeda: {

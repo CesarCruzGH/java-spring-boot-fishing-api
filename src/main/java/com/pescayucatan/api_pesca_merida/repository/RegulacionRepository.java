@@ -13,6 +13,9 @@ public interface RegulacionRepository extends JpaRepository<Regulacion, Long> {
     @Query("SELECT r FROM Regulacion r JOIN FETCH r.pez JOIN FETCH r.zona WHERE r.pez.id = :pezId")
     List<Regulacion> findByPezId(@Param("pezId") Long pezId);
 
+    @Query("SELECT r FROM Regulacion r JOIN FETCH r.pez JOIN FETCH r.zona LEFT JOIN FETCH r.artePesca WHERE r.pez.id = :pezId")
+    List<Regulacion> findByPezIdWithArtes(@Param("pezId") Long pezId);
+
     @Query("SELECT r FROM Regulacion r JOIN FETCH r.pez JOIN FETCH r.zona WHERE r.zona.id = :zonaId")
     List<Regulacion> findByZonaId(@Param("zonaId") Long zonaId);
 }
